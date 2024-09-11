@@ -1,4 +1,4 @@
-import  «RelationalCalculus».Basic
+import RelationalCalculus.Basic
 open Relation
 
 -- Ordering by Inclusion
