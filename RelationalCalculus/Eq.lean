@@ -14,14 +14,7 @@ infix:50 " ≃ " => Relation.eq
 theorem Relation.eval_eq_iff_eq {R S : Relation α β} : (eval R = eval S) ↔ (R ≃ S) := by
   constructor
   · intro h
-    unfold eq
-    constructor
-    · apply le_rel_iff_le_eval.mpr
-      rw [h]
-      -- exact le_refl _
-    · apply le_rel_iff_le_eval.mpr
-      rw [←h]
-      -- exact le_refl _
+    constructor <;> rw [le_rel_iff_le_eval, h]
   · intro h
     unfold eq at h
     apply funext
