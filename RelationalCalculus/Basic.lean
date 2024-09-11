@@ -1,16 +1,12 @@
 import Mathlib.Tactic
 set_option pp.coercions false
 
-
 universe u v
 
+-- This is an extensional (set-like) definition of a relation as a subset of the Cartesian product α × β. The goal of many theorems will be to relate the algebraic structure of relational expressions to the semantics based on subsets of pairs.
 abbrev Relation.Pairs (α β : Type u) : Type u  := (a:α) → (b:β) → Prop
 
-
-
-#check fun {α β : Type u} (R S : Relation.Pairs α β) => R ≤ S
-
--- The Relation inductive type gives the syntactic composition structure of relations. Relation.eval defines the semantic domain for this syntax.
+-- The Relation inductive type gives the syntactic composition structure of relations. This defines the fundamental objects to be manipulated by the relational calculus.
 inductive Relation  : (Dom : Type u) → (Cod : Type u) → Type (u+1)
 -- atomic forms a relation directly from a set of pairs
 | atomic  {α β : Type u} (f:Relation.Pairs α β)  :  Relation α β
@@ -54,16 +50,25 @@ inductive Relation  : (Dom : Type u) → (Cod : Type u) → Type (u+1)
 -- Right is an injection relation from a value to itself in the right side of a sum type. The converse is a kind of second projection that works with Sum types.
 | right (α β : Type u) : Relation α (Sum β α)
 
-open Relation
 
-def Relation.domain (_: Relation α β) := α
-def Relation.codomain (_: Relation α β) := β
+open Relation
+namespace Relation
+
+postfix: 80 "ᵒ" => converse -- \^o (hat and then letter)
+postfix: 80 "⁻" => complement -- \^- (hat dash)
+infixl: 70 " ⊗ " => product -- \otimes
+infixl: 60 " ⊕ " => coproduct -- \oplus
+infixl: 40 " ▹ " => comp -- \trans
+
+
+def domain (_: Relation α β) := α
+def codomain (_: Relation α β) := β
 
 -- *** Eval - Semantics for Relations ***
--- Relation.eval defines the semantic domain of the Relation inductive type. It allows us to prove that different syntactic Relation expressions are extensionally equal.
+-- eval defines the semantic domain of the Relation inductive type. It allows us to prove that different syntactic Relation expressions are extensionally equal.
 
 
-def Relation.eval (R : Relation α β) : Relation.Pairs α β :=
+def eval (R : Relation α β) : Relation.Pairs α β :=
 match R with
 -- For atomic relations, we simply return the pair function
 | atomic f => f
@@ -117,73 +122,57 @@ match R with
 
 
 -- Expresses the evaluation function as a relation
-def Relation.evalRel {α β : Type u} : Relation (Relation α β) (PLift (Relation.Pairs α β)) :=
+def evalRel {α β : Type u} : Relation (Relation α β) (PLift (Pairs α β)) :=
   atomic fun (R : Relation α β) (f: PLift (Pairs α β) ) =>
-    let evaluatedR := PLift.up (Relation.eval R)
+    let evaluatedR := PLift.up (eval R)
   evaluatedR = f
 
 -- **DEFINED RELATION OPERATIONS** --
 
 -- Merge is the converse of copy
-def Relation.merge (α) := converse (copy α)
+def merge (α) := converse (copy α)
 
 -- Sends each a in α to left a and right a
-def Relation.split  (α : Type u) := converse (collapse α)
+def split  (α : Type u) := converse (collapse α)
 
 
 -- This is a notion from Peirce/Tarski of a second sequential composition operation that is the logical dual of ordinary composition. It replaces the  existential quantifier (∃) in the definition of composition with a universal quantifier (∀) and replaces conjunction (∧) with disjunction (∨). It can be defined by a De Morgan equivalence.
 -- TODO: Add a proof that this compositional definition is equal to the direct logical definition.
-def Relation.relativeComp (R : Relation α β) (S :Relation β γ) := complement (comp (complement R) (complement S))
+def relativeComp (R : Relation α β) (S :Relation β γ) := complement (comp (complement R) (complement S))
 
 -- The converse complement of a relation is often refered to as the relative or linear negation of the relation. Note, that this is order invariant, i.e. complement converse = converse complemetn (proof below).
-def Relation.negation (R : Relation α β) := converse (complement R)
+def negation (R : Relation α β) := converse (complement R)
+abbrev neg (R : Relation α β) :=  R.negation
+postfix: 80 "ᗮ" => Relation.negation -- \^bot
 
-abbrev Relation.neg (R : Relation α β) :=  R.negation
-
--- In linear logic, par (upside down &) is the DeMorgan dual of product.
-def Relation.par (R : Relation α β) (S : Relation γ δ) : Relation (α × γ) (β × δ) := neg (product (neg R) (neg S))
+-- In linear logic, ar (upside down &) is the DeMorgan dual of product.
+def par (R : Relation α β) (S : Relation γ δ) : Relation (α × γ) (β × δ) := neg (product (neg R) (neg S))
 
 -- In linear logic, the operation with (&) is the DeMorgan dual of coproduct.
-def Relation.with (R : Relation α β) (S : Relation γ δ) :=  neg (coproduct (neg R) (neg S))
+def withR (R : Relation α β) (S : Relation γ δ) :=  neg (coproduct (neg R) (neg S))
 
 -- An empty relation is the complement of the full relation.
-def Relation.empty (α β : Type u) := complement (full α β)
+def empty (α β : Type u) := complement (full α β)
 
 -- The identity relation is the composition of copy and merge
-def Relation.IdRel (α : Type u) := comp (copy α) (merge α)
+def IdRel (α : Type u) := comp (copy α) (merge α)
 
 -- The complement of identity is a relation consisting of all pairs of elements that are not identical.
-def Relation.nonId (α : Type u) := complement (IdRel α)
+def nonId (α : Type u) := complement (IdRel α)
 
 --The (linear) negation of copy is a "different" relation that relates pairs in α × α of non-equal elements to every element in α. This is useful for compositionally removing reflexive pairs from a relation.
-def Relation.different (α: Type u) := neg (copy α)
+def different (α: Type u) := neg (copy α)
 
-
-
-
-
-namespace Relation
---NOTATION FOR RELATION OPERATIONS
-
-postfix: 80 "ᵒ" => converse -- \^o (hat and then letter)
-postfix: 80 "⁻" => complement -- \^- (hat dash)
-postfix: 80 "ᗮ" => Relation.negation -- \^bot
-infixl: 70 " ⊗ " => product -- \otimes
-infixl: 60 " ⊕ " => coproduct -- \oplus
-infixl: 40 " ▹ " => comp -- \trans
-
-end Relation
 
 -- Residuation / Linear Implication
-
-def Relation.linImp (R S : Relation α β) := (Rᵒ▹S⁻)⁻
-abbrev Relation.linImpRight (R S : Relation α β) := Relation.linImp R S
-def Relation.linImpLeft (R S : Relation α β) := (S⁻▹Rᵒ)⁻
+def linImp (R S : Relation α β) := (Rᵒ▹S⁻)⁻
+abbrev linImpRight (R S : Relation α β) := linImp R S
+def linImpLeft (R S : Relation α β) := (S⁻▹Rᵒ)⁻
 
 namespace Relation
 --NOTATION FOR Linear Implication
-  infixr : 50 "⊸" => Relation.linImp -- \multi
-  infixl : 50 "⟜" => Relation.linImpLeft
+  infixr : 50 "⊸" => linImp -- \multi
+  infixl : 50 "⟜" => linImpLeft
 
 end Relation
 
@@ -191,38 +180,38 @@ end Relation
 
 -- Double converse equals original relation
 @[simp]
-theorem Relation.double_converse (R : Relation α β) : eval (converse (converse R)) = eval R := by
+theorem double_converse (R : Relation α β) : eval (converse (converse R)) = eval R := by
   apply funext; intro a; apply funext; intro b
-  simp [Relation.eval, Relation.converse]
+  simp [eval, converse]
 
 -- Double complement equals original relation
 @[simp]
-theorem Relation.double_complement (R : Relation α β) : eval (complement (complement R)) = eval R := by
+theorem double_complement (R : Relation α β) : eval (complement (complement R)) = eval R := by
   apply funext; intro a; apply funext; intro b
-  simp [Relation.eval, Relation.complement]
+  simp [eval, complement]
 
 -- Double negation (converse complement) equals original relation
 @[simp]
-theorem Relation.double_neg (R : Relation α β) : eval (neg (neg R)) = eval R := by
+theorem double_neg (R : Relation α β) : eval (neg (neg R)) = eval R := by
   apply funext; intro a; apply funext; intro b
-  simp [Relation.eval, Relation.neg,  Relation.complement, Relation.converse]
+  simp [eval, neg,  complement, converse]
 
 -- complement-converse equals converse-complement. We simply to the later.
 @[simp]
-theorem Relation.converse_complement_sym (R : Relation α β) : eval (complement (converse R)) =  eval (converse ( complement  R))  := by
+theorem converse_complement_sym (R : Relation α β) : eval (complement (converse R)) =  eval (converse ( complement  R))  := by
   apply funext; intro b; apply funext; intro a;
-  simp [Relation.eval]
+  simp [eval]
 
 -- Complement-converse simplifies to negation. This is really trival but it helps display the expressions in a more readable way.
 @[simp]
-theorem Relation.complement_converse_to_neg (R : Relation α β) : eval (complement (converse R)) = eval (neg R) := by
+theorem complement_converse_to_neg (R : Relation α β) : eval (complement (converse R)) = eval (neg R) := by
   apply funext; intro b; apply funext; intro a;
-  simp [Relation.eval, Relation.neg]
+  simp [eval, neg]
 
 
 -- Converse distributes over composition
 @[simp]
-theorem Relation.converse_comp (R : Relation α β) (S : Relation β γ) :
+theorem converse_comp (R : Relation α β) (S : Relation β γ) :
   eval (converse (comp R S)) = eval (comp (converse S) (converse R)) := by
   apply funext; intro c; apply funext; intro a
   simp [Relation.eval, Relation.comp, Relation.converse]
@@ -238,28 +227,28 @@ theorem Relation.converse_comp (R : Relation α β) (S : Relation β γ) :
 
 -- Converse distributes across product
 @[simp]
-theorem Relation.converse_product (R : Relation α β) (S : Relation γ δ) :
+theorem converse_product (R : Relation α β) (S : Relation γ δ) :
   eval (converse (product R S)) = eval (product (converse R) (converse S)) := by
   apply funext; intro ⟨b, d⟩; apply funext; intro ⟨a, c⟩
   simp [Relation.eval, Relation.product, Relation.converse]
 
 -- Complement distributes across product
 @[simp]
-theorem Relation.complement_product (R : Relation α β) (S : Relation γ δ) :
+theorem complement_product (R : Relation α β) (S : Relation γ δ) :
   eval (complement (product R S)) = eval (par (complement R) (complement S)) := by
   apply funext; intro ⟨a, c⟩; apply funext; intro ⟨b, d⟩
   simp [Relation.eval]
 
 -- Negation distribtes across product
 @[simp]
-theorem Relation.neg_product (R : Relation α β) (S : Relation γ δ) :
+theorem neg_product (R : Relation α β) (S : Relation γ δ) :
   eval (neg (product R S)) = eval (par (neg R) (neg S)) := by
   apply funext; intro ⟨a, c⟩; apply funext; intro ⟨b, d⟩
   simp [Relation.eval]
 
 -- Converse distributes across coproduct
 @[simp]
-theorem Relation.converse_coproduct (R : Relation α β) (S : Relation γ δ) :
+theorem converse_coproduct (R : Relation α β) (S : Relation γ δ) :
   eval (converse (coproduct R S)) = eval (coproduct (converse R) (converse S)) := by
   apply funext; intro ab; apply funext; intro cd
   cases ab <;> cases cd
@@ -270,8 +259,8 @@ theorem Relation.converse_coproduct (R : Relation α β) (S : Relation γ δ) :
 
 --  Complement distributes across coproduct
 @[simp]
-theorem Relation.complement_coproduct (R : Relation α β) (S : Relation γ δ) :
-eval (complement (coproduct R S)) = eval (Relation.with (complement R) (complement S)) := by
+theorem complement_coproduct (R : Relation α β) (S : Relation γ δ) :
+eval (complement (coproduct R S)) = eval (withR (complement R) (complement S)) := by
 apply funext; intro ab; apply funext; intro cd
 cases ab <;> cases cd
 . simp [Relation.eval]
@@ -281,7 +270,7 @@ cases ab <;> cases cd
 
 -- Composition is associative.
 @[simp]
-theorem Relation.assoc_comp (R : Relation α β) (S : Relation β γ) (T: Relation γ δ) :
+theorem assoc_comp (R : Relation α β) (S : Relation β γ) (T: Relation γ δ) :
   eval (comp (comp R S) T) = eval (comp R (comp S T)) := by
   apply funext; intro a; apply funext; intro d
   simp [Relation.eval, Relation.comp]
@@ -294,12 +283,13 @@ theorem Relation.assoc_comp (R : Relation α β) (S : Relation β γ) (T: Relati
 
 
 
-abbrev Relation.EndoRelation (α: Type U) := Relation α α
+abbrev EndoRelation (α: Type U) := Relation α α
+
+end Relation
+
 
 
 -- *** Odds and Ends (Very Rough WIP) ***
-
-
 -- Helper for getArityType. Note that arity' is arity - 1.
 def getProduct (α : Type u) (arity': Nat) : Type u :=
   match arity' with

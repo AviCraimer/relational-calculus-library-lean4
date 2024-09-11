@@ -42,6 +42,11 @@ def subtract {α β : Type u} (R S : Relation α β) : Relation α β :=
   let Disconnected := D▹R▹D
   Disconnectedᵒ
 
--- TODO Prove this works with evaluation
 
-infix: 50 "-" => subtract
+infixl: 60 "⊖" => subtract -- \ominus
+
+-- TODO: Prove the composition definition of subtraction works as expected under evaluation
+theorem subtract_eval {α β : Type u} (R S : Relation α β)(a:α)(b:β): (eval (R⊖S) a b) ↔ (eval R a b) ∧ ¬(eval S a b) := sorry
+
+
+end Relation
