@@ -65,11 +65,9 @@ def domain (_: Relation α β) := α
 def codomain (_: Relation α β) := β
 
 -- *** Eval - Semantics for Relations ***
--- eval defines the semantic domain of the Relation inductive type. It allows us to prove that different syntactic Relation expressions are extensionally equal.
-
-
-def eval (R : Relation α β) : Relation.Pairs α β :=
-match R with
+-- eval defines the semantic domain of the Relation inductive type. It allows us to prove that different syntactic Relation are equal under evaluation.
+def eval (Rel : Relation α β) : Pairs α β :=
+match Rel with
 -- For atomic relations, we simply return the pair function
 | atomic f => f
 
@@ -77,23 +75,24 @@ match R with
 | pair a b => fun (a': α ) (b': β) => a = a' ∧ b = b'
 
 -- A sequential composition of relations yeilds pair if there exists a common element in the middle Codomain/Domain. Note that for relations which have the structure of a function (i.e., relations with the properties of totality and determinism) this definition specializes to the standard definition of function composition.
-| comp R S => fun (a : R.domain) (c : S.codomain) =>
+| R ▹ S => fun (a : R.domain) (c : S.codomain) =>
   ∃ (b : S.domain), Relation.eval R a b ∧ Relation.eval S b c
 
 -- A full relation has all pairs so returns a constant True proposition.
 | full α β => fun _ _ => True
 
 -- Converse returns an evaluation with the order of the arguments switched.
-| converse R => fun a b => (Relation.eval R b a)
+| Rᵒ  => fun a b => (Relation.eval R b a)
 
 -- Complement returns the negation of evaluated proposition for each pair.
-| complement R => fun a b => ¬(Relation.eval R a b)
+-- TODO: Investigate why pattern matching isn't working with the notation R⁻
+|  complement R  => fun a b => ¬(Relation.eval R a b)
 
 -- Product returns true iff the first element of the domain is related by R to the first element of the codomain AND the second element of domain is related by S to the second element of the codomain.
-| product R S => fun (a: (product R S).domain) (b: (product R S).codomain) => (Relation.eval R a.1 b.1) ∧ (Relation.eval S a.2 b.2)
+| product R S => fun (a: (R ⊗ S).domain) (b: (R ⊗ S).codomain) => (Relation.eval R a.1 b.1) ∧ (Relation.eval S a.2 b.2)
 
 -- Coproduct returns true iff a left element of the domain is related by R to a left element of the codomain OR a right element of the domain is related by S to the right element of the codomain.
-| coproduct R S => fun (a: (coproduct R S).domain) (b: (coproduct R S).codomain) =>
+| coproduct R S => fun (a: (R⊕S).domain) (b: ((R⊕S)).codomain) =>
   match a, b with
   | Sum.inl a', Sum.inl b' => Relation.eval R a' b'
   | Sum.inr a', Sum.inr b' => Relation.eval S a' b'
@@ -130,39 +129,39 @@ def evalRel {α β : Type u} : Relation (Relation α β) (PLift (Pairs α β)) :
 -- **DEFINED RELATION OPERATIONS** --
 
 -- Merge is the converse of copy
-def merge (α) := converse (copy α)
+def merge (α) := (copy α)ᵒ
 
 -- Sends each a in α to left a and right a
-def split  (α : Type u) := converse (collapse α)
+def split  (α : Type u) := (collapse α)ᵒ
 
 
 -- This is a notion from Peirce/Tarski of a second sequential composition operation that is the logical dual of ordinary composition. It replaces the  existential quantifier (∃) in the definition of composition with a universal quantifier (∀) and replaces conjunction (∧) with disjunction (∨). It can be defined by a De Morgan equivalence.
 -- TODO: Add a proof that this compositional definition is equal to the direct logical definition.
-def relativeComp (R : Relation α β) (S :Relation β γ) := complement (comp (complement R) (complement S))
+def relativeComp (R : Relation α β) (S :Relation β γ) :=  (R⁻▹S⁻)⁻
 
 -- The converse complement of a relation is often refered to as the relative or linear negation of the relation. Note, that this is order invariant, i.e. complement converse = converse complemetn (proof below).
-def negation (R : Relation α β) := converse (complement R)
+def negation (R : Relation α β) := R⁻ᵒ
 abbrev neg (R : Relation α β) :=  R.negation
 postfix: 80 "ᗮ" => Relation.negation -- \^bot
 
 -- In linear logic, ar (upside down &) is the DeMorgan dual of product.
-def par (R : Relation α β) (S : Relation γ δ) : Relation (α × γ) (β × δ) := neg (product (neg R) (neg S))
+def par (R : Relation α β) (S : Relation γ δ) : Relation (α × γ) (β × δ) := (Rᗮ⊗Sᗮ)ᗮ
 
 -- In linear logic, the operation with (&) is the DeMorgan dual of coproduct.
-def withR (R : Relation α β) (S : Relation γ δ) :=  neg (coproduct (neg R) (neg S))
+def withR (R : Relation α β) (S : Relation γ δ) := (Rᗮ⊕Sᗮ)ᗮ
 
 -- An empty relation is the complement of the full relation.
-def empty (α β : Type u) := complement (full α β)
+def empty (α β : Type u) :=  (full α β)⁻
 
 -- The identity relation is the composition of copy and merge
-def IdRel (α : Type u) := comp (copy α) (merge α)
+def IdRel (α : Type u) := (copy α)▹(merge α)
+-- TODO: add eval proof
 
 -- The complement of identity is a relation consisting of all pairs of elements that are not identical.
-def nonId (α : Type u) := complement (IdRel α)
+def nonId (α : Type u) := (IdRel α)⁻
 
 --The (linear) negation of copy is a "different" relation that relates pairs in α × α of non-equal elements to every element in α. This is useful for compositionally removing reflexive pairs from a relation.
-def different (α: Type u) := neg (copy α)
-
+def different (α: Type u) := (copy α)ᗮ
 
 -- Residuation / Linear Implication
 def linImp (R S : Relation α β) := (Rᵒ▹S⁻)⁻
@@ -177,6 +176,8 @@ namespace Relation
 end Relation
 
 -- *** Simplification Theorems ***
+
+-- TODO: Use notation in defining the theorems to make them easier to read.
 
 -- Double converse equals original relation
 @[simp]
