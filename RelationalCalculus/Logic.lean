@@ -31,15 +31,12 @@ theorem biequivalentProps (R : PropR) : (R ≃ TrueR) ∨ (R ≃ FalseR) := by
   exfalso
   sorry
   -- TODO almost there!
-  -- simp [eval] at h
-  -- funext a' b'
-
 
 
 def andR (P Q: PropR) : PropR := TrueR ▹ (copy {⋆}) ▹ P ⊗ Q ▹ merge {⋆}
 infixl: 90 " ∧ " => andR
 
-def orR (P Q: PropR) : PropR :=  TrueR ▹ split {⋆} ▹ P ⊕ Q ▹ cocopy {⋆}
+def orR (P Q: PropR) : PropR :=  TrueR ▹ split {⋆} ▹ P ⊕ Q ▹ collapse {⋆}
 infixl: 85 " ∨ " => orR
 
 def notR (P: PropR) : PropR := P⁻

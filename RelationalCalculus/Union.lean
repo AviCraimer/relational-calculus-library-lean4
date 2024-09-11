@@ -7,7 +7,7 @@ open Relation
 --- *** Relational Union ***
 
 -- Compositional definition of union of relations. I should prove that this yeilds the set theoretic definition of union of pairs.
-def Relation.union (R : Relation α β) (S : Relation α β) := comp (comp (Relation.split α) (coproduct R S)) (cocopy β)
+def Relation.union (R : Relation α β) (S : Relation α β) := comp (comp (Relation.split α) (coproduct R S)) (collapse β)
 
 namespace Relation
 infix: 50 "∪" => Relation.union

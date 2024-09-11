@@ -36,11 +36,11 @@ inductive Relation  : (Dom : Type u) → (Cod : Type u) → Type (u+1)
 -- This is the coproduct in the category Rel. It corresponds to one of the disjunction operations in linear logic, usually represented as ⊕. It is interpreted as a disjoint union of domain, codomain, and relational pairs.
 | coproduct {α β γ δ : Type u} (R : Relation α β) (S : Relation γ δ) : Relation (Sum α γ ) (Sum β δ)
 
--- Copy is the diagonal relation, connecting each value in the domain to a pair of identical copies in the codomain. The converse of this is a "merge" relation that sents pairs of identicals to a single copy.  The converse complement (linear negation) of copy is a "different" relation that sends pairs of different elements to all elements.
+-- Copy is the diagonal relation, connecting each value in the domain to a pair of identical copies in the codomain. The converse of this is a "merge" relation that sents pairs of identicals to a single copy.
 | copy (α : Type u) : Relation α (α × α)
 
--- cocopy is the categorical dual of copy.  It relates the left and right values of a reflexitve sum type to their common value. This allows us to collapse or merge the disjoint sets of the Sum into a single set which is used to define union. The converse is a "split" relation that splits a single value into two parallel copies in disjoint sets.
-| cocopy (α: Type u) : Relation (Sum α α) α
+-- Collapse is the categorical dual of copy (a.k.a. cocopy).  It relates every left and right values of a sum type α + α  to equal values in α. This allows us to collapse the disjoint sets of the sum type into a single set. Among other things, this operation allows us to define a union operation compositonally. The converse is a "split" relation that splits a single value into two parallel copies in the disjoint sets.
+|   collapse (α: Type u) : Relation (Sum α α) α
 
 -- First is a projection relation from a pair in the domain to the first member of the pair. The converse inserts a value into all pairs where it occurs in first position.
 | first (α β : Type u) : Relation (α × β) α
@@ -96,7 +96,7 @@ match R with
 
 | copy α => fun a (a1, a2) => a = a1 ∧ a = a2
 
-| cocopy α => fun (aa) a =>
+| collapse α => fun (aa) a =>
   match aa with
   | Sum.inl a' => a' = a
   | Sum.inr a' => a' = a
@@ -128,10 +128,10 @@ def Relation.evalRel {α β : Type u} : Relation (Relation α β) (PLift (Relati
 def Relation.merge (α) := converse (copy α)
 
 -- Sends each a in α to left a and right a
-def Relation.split  (α : Type u) := converse (cocopy α)
+def Relation.split  (α : Type u) := converse (collapse α)
 
 
--- This is a notion from Peirce/Tarski of a second sequential composition operation that is the logical dual of ordinary composition. It replaces the  existential quantifier (∃) in the definition of composition with a universal quantifier (∀). However, it can be defined by a De Morgan equivalence.
+-- This is a notion from Peirce/Tarski of a second sequential composition operation that is the logical dual of ordinary composition. It replaces the  existential quantifier (∃) in the definition of composition with a universal quantifier (∀) and replaces conjunction (∧) with disjunction (∨). It can be defined by a De Morgan equivalence.
 -- TODO: Add a proof that this compositional definition is equal to the direct logical definition.
 def Relation.relativeComp (R : Relation α β) (S :Relation β γ) := complement (comp (complement R) (complement S))
 
@@ -140,23 +140,27 @@ def Relation.negation (R : Relation α β) := converse (complement R)
 
 abbrev Relation.neg (R : Relation α β) :=  R.negation
 
--- In linear logic, Par is the DeMorgan dual of product.
+-- In linear logic, par (upside down &) is the DeMorgan dual of product.
 def Relation.par (R : Relation α β) (S : Relation γ δ) : Relation (α × γ) (β × δ) := neg (product (neg R) (neg S))
 
--- In linear logic, With is the DeMOrgan dual of coproduct.
+-- In linear logic, the operation with (&) is the DeMorgan dual of coproduct.
 def Relation.with (R : Relation α β) (S : Relation γ δ) :=  neg (coproduct (neg R) (neg S))
 
 -- An empty relation is the complement of the full relation.
 def Relation.empty (α β : Type u) := complement (full α β)
 
--- The different relation is the negation (converse complement) of copy.
-def Relation.different (α: Type u) := neg (copy α)
-
 -- The identity relation is the composition of copy and merge
 def Relation.IdRel (α : Type u) := comp (copy α) (merge α)
 
--- The complement of identity is a relation consisting of all pairs of elements that are not equal.
-def Relation.notEqual (α : Type u) := complement (IdRel α)
+-- The complement of identity is a relation consisting of all pairs of elements that are not identical.
+def Relation.nonId (α : Type u) := complement (IdRel α)
+
+--The (linear) negation of copy is a "different" relation that relates pairs in α × α of non-equal elements to every element in α. This is useful for compositionally removing reflexive pairs from a relation.
+def Relation.different (α: Type u) := neg (copy α)
+
+
+
+
 
 namespace Relation
 --NOTATION FOR RELATION OPERATIONS
