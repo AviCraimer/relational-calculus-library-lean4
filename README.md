@@ -21,29 +21,29 @@ The relational calculus is an algebraic theory and logic based on binary relatio
 
 The documentation is just a sketch at this point. I'll work on filling it out over time.
 
-### Basic.lean
+### [Basic.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Basic.lean)
 - Definition of `Relation` an inductive data type for terms of the relational calculus
 - Definition of `eval` to provide a semantic domain and the ability to use it for computation.
 - Definition of basic operations on relations
 - Various theorems
 
-### Order.lean
+### [Order.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Order.lean)
 - Definition of a $\leq$ relation based on the lattice of sub-relations. Set theoretically this is just inclusion.
 - Typeclass instances for Setoid and Preorder
 
-### Eq.lean
+### [Eq.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Eq.lean)
 - Defining equivalence between relations
 - Various related theorems
 
-### Union.lean
+### [Union.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Union.lean)
 - Defining `union` operation on relations
 - Various theorems
 
-### Intersection.lean
+### [Intersection.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Intersection.lean)
 - Defining `intersection` operation on relations
 - Various theorems
 
-### Logic.lean
+### [Logic.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Logic.lean)
 - Defining Propositions as Relations
 - Defining classical propositional connectives using relations
 - Defining quantifiers using relations
