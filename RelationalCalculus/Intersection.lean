@@ -1,21 +1,21 @@
-import  «RelationalCalculus».Basic
-import  «RelationalCalculus».Order
-import  «RelationalCalculus».Eq
-import  «RelationalCalculus».Union
+import RelationalCalculus.Basic
+import RelationalCalculus.Order
+import RelationalCalculus.Eq
+import RelationalCalculus.Union
 
 namespace Relation
 
 -- Compositional definition of intersection of relations.
-def intersection (R: Relation α β) (S: Relation α β) := comp (comp (copy α) (product R S)) (Relation.merge β)
+def intersection (R : Relation α β) (S : Relation α β) := comp (comp (copy α) (product R S)) (Relation.merge β)
 
 infix: 50 "∩" => intersection
 
 
 -- We give the direct set-theoretic definition of an intersection of two relations.
-def intersect.pairs_def (R: Relation α β) (S: Relation α β): Pairs α β  := fun a b => (eval R) a b ∧ (eval S) a b
+def intersect.pairs_def (R : Relation α β) (S : Relation α β) : Pairs α β  := fun a b => (eval R) a b ∧ (eval S) a b
 
 -- Proof that the compositional definition of intersection is equal to the set theoretic definiton.
-theorem intersect.pairs_eq_eval (R: Relation α β) (S: Relation α β) : intersect.pairs_def R S  = eval (intersection R S)   := by
+theorem intersect.pairs_eq_eval (R : Relation α β) (S : Relation α β) : intersect.pairs_def R S = eval (intersection R S)   := by
 symm
 apply funext
 intro a
@@ -37,7 +37,7 @@ constructor <;> rfl
 
 
 -- Compositional Definition of Subtraction one relation from another.
-def subtract {α β :Type u} (R S: Relation α β ): Relation α β :=
+def subtract {α β : Type u} (R S : Relation α β) : Relation α β :=
   let D := (R ∩ S)ᗮ
   let Disconnected := D▹R▹D
   Disconnectedᵒ

@@ -1,23 +1,23 @@
-import  «RelationalCalculus».Basic
-import  «RelationalCalculus».Order
-import  «RelationalCalculus».Eq
+import RelationalCalculus.Basic
+import RelationalCalculus.Order
+import RelationalCalculus.Eq
 open Relation
 
 
 --- *** Relational Union ***
 
 -- Compositional definition of union of relations. I should prove that this yeilds the set theoretic definition of union of pairs.
-def Relation.union (R: Relation α β) (S: Relation α β) := comp (comp (Relation.split α) (coproduct R S)) (cocopy β)
+def Relation.union (R : Relation α β) (S : Relation α β) := comp (comp (Relation.split α) (coproduct R S)) (cocopy β)
 
 namespace Relation
 infix: 50 "∪" => Relation.union
 end Relation
 
 -- We give the direct set-theoretic definition of a union of two relations.
-def Relation.union.pairs_def (R: Relation α β) (S: Relation α β): Pairs α β  := fun a b => (eval R) a b ∨ (eval S) a b
+def Relation.union.pairs_def (R : Relation α β) (S : Relation α β) : Pairs α β  := fun a b => (eval R) a b ∨ (eval S) a b
 
 -- Proof that the compositional definition of union is equal to the set theoretic definiton.
-theorem Relation.union.eval_eq_pairs (R: Relation α β) (S: Relation α β) : eval (Relation.union R S) = union.pairs_def R S := by
+theorem Relation.union.eval_eq_pairs (R : Relation α β) (S : Relation α β) : eval (Relation.union R S) = union.pairs_def R S := by
 apply funext
 intro a
 apply funext

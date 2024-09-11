@@ -1,5 +1,5 @@
-import  «RelationalCalculus».Basic
-import  «RelationalCalculus».Order
+import RelationalCalculus.Basic
+import RelationalCalculus.Order
 open Relation
 
 
