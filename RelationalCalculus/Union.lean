@@ -10,7 +10,7 @@ open Relation
 def Relation.union (R : Relation α β) (S : Relation α β) := comp (comp (Relation.split α) (coproduct R S)) (collapse β)
 
 namespace Relation
-infix: 50 "∪" => Relation.union
+infix:50 "∪" => Relation.union
 end Relation
 
 -- We give the direct set-theoretic definition of a union of two relations.

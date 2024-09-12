@@ -16,24 +16,21 @@ def intersect.pairs_def (R : Relation α β) (S : Relation α β) : Pairs α β 
 
 -- Proof that the compositional definition of intersection is equal to the set theoretic definiton.
 theorem intersect.pairs_eq_eval (R : Relation α β) (S : Relation α β) : intersect.pairs_def R S = eval (intersection R S)   := by
-symm
-apply funext
-intro a
-apply funext
-intro b
-simp [eval, intersect.pairs_def, intersection]
-constructor
-intro ⟨⟨c1, c2⟩, ⟨⟨a1, a2⟩, ⟨ha1, ha2⟩, hr, hs⟩, ⟨hb1, hb2⟩⟩
-subst ha1
-subst ha2
-subst hb1
-subst hb2
-exact ⟨hr, hs⟩
-intro ⟨hr, hs⟩
-use (b, b)
-constructor
-use (a, a)
-constructor <;> rfl
+  symm
+  apply funext
+  intro a
+  apply funext
+  intro b
+  simp [eval, intersect.pairs_def, intersection]
+  constructor
+  · intro ⟨⟨c1, c2⟩, ⟨⟨a1, a2⟩, ⟨ha1, ha2⟩, hr, hs⟩, ⟨hb1, hb2⟩⟩
+    subst ha1 ha2 hb1 hb2
+    exact ⟨hr, hs⟩
+  intro ⟨hr, hs⟩
+  use (b, b)
+  constructor
+  use (a, a)
+  constructor <;> rfl
 
 
 -- Compositional Definition of Subtraction one relation from another.

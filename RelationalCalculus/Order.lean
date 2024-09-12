@@ -10,16 +10,10 @@ open Relation
 
 namespace Relation
 --  R ≤  S if and only if they eval to pair functions that are less than or equal to eachother.
-theorem le_rel_iff_le_eval {α β : Type u} {R S : Relation α β} :
-  R ≤ S ↔ (eval R ≤ eval S) := by
-  constructor
-  · intro h
-    intro a b
-    exact h a b
-  · intro h
-    intro a b
-    exact h a b
 
+theorem le_rel_iff_le_eval {α β : Type u} {R S : Relation α β} :
+    R ≤ S ↔ (eval R ≤ eval S) := by
+  rfl
 
 -- Prove that this ordering is reflexive
 theorem le_refl (R : Relation α β) : R ≤ R := by

@@ -12,7 +12,7 @@ inductive Relation  : (Dom : Type u) → (Cod : Type u) → Type (u+1)
 | atomic  {α β : Type u} (f:Relation.Pairs α β)  :  Relation α β
 
 -- pair forms a relation as a pair of two values. This is useful for forming higher-order relations from existing relations.
-| pair {α β : Type u} (a: α) (b: β) : Relation α β
+| pair {α β : Type u} (a : α) (b : β) : Relation α β
 
 -- comp stands for composition, and it is the sequential composition operation, which is defined analogously to function composition.
 | comp {α β γ : Type u} (R : Relation α β) (S :Relation β γ) : Relation α γ
@@ -215,12 +215,8 @@ theorem complement_converse_to_neg (R : Relation α β) : eval (complement (conv
 theorem converse_comp (R : Relation α β) (S : Relation β γ) :
   eval (converse (comp R S)) = eval (comp (converse S) (converse R)) := by
   apply funext; intro c; apply funext; intro a
-  simp [Relation.eval, Relation.comp, Relation.converse]
-  apply Iff.intro
-  . intro ⟨b, hab, hbc⟩
-    exact ⟨b, hbc, hab⟩
-  . intro ⟨b, hcb, hba⟩
-    exact ⟨b, hba, hcb⟩
+  simp [Relation.eval]
+  constructor <;> exact fun ⟨b, hab, hbc⟩ => ⟨b, hbc, hab⟩
 
 -- TODO:
   -- Complement distributes over composition?
@@ -263,19 +259,15 @@ theorem converse_coproduct (R : Relation α β) (S : Relation γ δ) :
 theorem complement_coproduct (R : Relation α β) (S : Relation γ δ) :
 eval (complement (coproduct R S)) = eval (withR (complement R) (complement S)) := by
 apply funext; intro ab; apply funext; intro cd
-cases ab <;> cases cd
-. simp [Relation.eval]
-. simp [Relation.eval]
-. simp [Relation.eval]
-. simp [Relation.eval]
+cases ab <;> cases cd <;> simp [Relation.eval]
 
 -- Composition is associative.
 @[simp]
-theorem assoc_comp (R : Relation α β) (S : Relation β γ) (T: Relation γ δ) :
+theorem assoc_comp (R : Relation α β) (S : Relation β γ) (T : Relation γ δ) :
   eval (comp (comp R S) T) = eval (comp R (comp S T)) := by
   apply funext; intro a; apply funext; intro d
-  simp [Relation.eval, Relation.comp]
-  apply Iff.intro
+  simp [Relation.eval]
+  constructor
   . intro ⟨c, ⟨b, hab, hbc⟩, hcd⟩
     exact ⟨b, hab, ⟨c, hbc, hcd⟩⟩
   . intro ⟨b, hab, ⟨c, hbc, hcd⟩⟩
@@ -299,34 +291,30 @@ def getProduct (α : Type u) (arity': Nat) : Type u :=
 
 -- Returns PUnit for arity 0, returns α for arity 1, α × α for arity 2, etc.
 def getArityType (α : Type u) (arity: Nat) : Type u :=
-if arity == 0 then PUnit else  getProduct α (arity-1)
+if arity == 0 then PUnit else getProduct α (arity-1)
 
 
 
 
--- theorem Relation.product_coproduct__dist (R : Relation α α) (S : Relation α α) (T: Relation α α) :
+-- theorem Relation.product_coproduct__dist (R : Relation α α) (S : Relation α α) (T : Relation α α) :
 --   eval (product (coproduct R S) T) = eval (coproduct (product R T) (product S T)) := sorry
 
--- theorem Relation.coproduct_product_dist (R : Relation α β) (S : Relation γ δ) (T: Relation ε ζ) :
+-- theorem Relation.coproduct_product_dist (R : Relation α β) (S : Relation γ δ) (T : Relation ε ζ) :
 -- eval (product (coproduct R S) T) = eval (coproduct (product R T) (product S T))  := by sorry
 
 --  Equiv.sumProdDistrib is the distributivity equivalence for Sum and Product types. We need to apply this so the types match on either side of the eqution.
 -- (R⊕S)⊗T ≅ (R⊗T)⊕(S⊗T)
-theorem Relation.coproduct_product_dist (R : Relation α β) (S : Relation γ δ) (T: Relation ε ζ) :
+theorem Relation.coproduct_product_dist (R : Relation α β) (S : Relation γ δ) (T : Relation ε ζ) :
   eval (product (coproduct R S) T) =
-    fun (a:(α ⊕ γ) × ε) (b: (β ⊕ δ) × ζ) =>
+    fun (a :(α ⊕ γ) × ε) (b : (β ⊕ δ) × ζ) =>
       let prodPlusProd := eval (coproduct (product R T) (product S T))
       let isoDomain := (Equiv.sumProdDistrib α γ ε)
       let isoCodomain := (Equiv.sumProdDistrib β δ ζ)
       prodPlusProd (isoDomain a) (isoCodomain b) := by
   apply funext; intro a; apply funext; intro b
   dsimp [Relation.eval, Equiv.sumProdDistrib]
-  cases a.1 <;> cases b.1
-  . simp
-  . simp
-  . simp
-  . simp
+  cases a.1 <;> cases b.1 <;> simp
 
 
 -- -- T⊕(R⊗S) = (T⊕R) ⊗ (T⊕S)
--- theorem Relation.product_coproduct_dist (R : Relation α β) (S : Relation γ δ) (T: Relation ε ζ) :
+-- theorem Relation.product_coproduct_dist (R : Relation α β) (S : Relation γ δ) (T : Relation ε ζ) :
