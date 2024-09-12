@@ -131,13 +131,39 @@ def evalRel {α β : Type u} : Relation (Relation α β) (PLift (Pairs α β)) :
 -- Merge is the converse of copy
 def merge (α) := (copy α)ᵒ
 
+
+theorem copy_merge_id {α : Type u}: eval (copy α ▹ merge α) = fun (a b: α ) => a = b  := by
+simp [merge, eval, domain, codomain]
+
+
+
 -- Sends each a in α to left a and right a
 def split  (α : Type u) := (collapse α)ᵒ
+
+theorem split_collapse_eq_id {α : Type u}: eval (split α ▹ collapse α) = fun (a b: α ) => a = b  := by
+simp [split, eval, domain, codomain]
+
+
+
 
 
 -- This is a notion from Peirce/Tarski of a second sequential composition operation that is the logical dual of ordinary composition. It replaces the  existential quantifier (∃) in the definition of composition with a universal quantifier (∀) and replaces conjunction (∧) with disjunction (∨). It can be defined by a De Morgan equivalence.
 -- TODO: Add a proof that this compositional definition is equal to the direct logical definition.
 def relativeComp (R : Relation α β) (S :Relation β γ) :=  (R⁻▹S⁻)⁻
+
+theorem relative_comp_eval  {R: Relation α β }{S :Relation β γ} : eval (relativeComp R S) = fun (a: α)(c: γ) => ∀(b: β), eval R a b ∨ eval S b c := by
+simp [relativeComp, complement, eval, domain ]
+funext a b
+simp [eval]
+constructor <;> intro h ;
+  · simp [Classical.or_iff_not_imp_left]
+    exact h
+simp [Classical.or_iff_not_imp_left.symm]
+exact h
+
+
+
+-- What is the tactic that expresses  ¬P → Q iff P o
 
 -- The converse complement of a relation is often refered to as the relative or linear negation of the relation. Note, that this is order invariant, i.e. complement converse = converse complemetn (proof below).
 def negation (R : Relation α β) := R⁻ᵒ
