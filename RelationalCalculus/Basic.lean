@@ -3,6 +3,7 @@ set_option pp.coercions false
 
 universe u v
 
+
 -- This is an extensional (set-like) definition of a relation as a subset of the Cartesian product α × β. The goal of many theorems will be to relate the algebraic structure of relational expressions to the semantics based on subsets of pairs.
 abbrev Relation.Pairs (α β : Type u) : Type u  := (a:α) → (b:β) → Prop
 
@@ -54,14 +55,16 @@ inductive Relation  : (Dom : Type u) → (Cod : Type u) → Type (u+1)
 open Relation
 namespace Relation
 
-postfix: 80 "ᵒ" => converse -- \^o (hat and then letter)
-postfix: 80 "⁻" => complement -- \^- (hat dash)
-infixl: 70 " ⊗ " => product -- \otimes
-infixl: 60 " ⊕ " => coproduct -- \oplus
-infixl: 40 " ▹ " => comp -- \trans
+postfix:80 "ᵒ" => converse -- \^o (hat and then letter)
+postfix:80 "⁻" => complement -- \^- (hat dash)
+infixl:70 " ⊗ " => product -- \otimes
+infixl:60 " ⊕ " => coproduct -- \oplus
+infixl:40 " ▹ " => comp -- \trans
 
-
+@[reducible]
 def domain (_: Relation α β) := α
+
+@[reducible]
 def codomain (_: Relation α β) := β
 
 -- *** Eval - Semantics for Relations ***
@@ -128,82 +131,10 @@ def evalRel {α β : Type u} : Relation (Relation α β) (PLift (Pairs α β)) :
 
 -- **DEFINED RELATION OPERATIONS** --
 
--- Merge is the converse of copy
-def merge (α) := (copy α)ᵒ
-
-
-theorem copy_merge_id {α : Type u}: eval (copy α ▹ merge α) = fun (a b: α ) => a = b  := by
-simp [merge, eval, domain, codomain]
-
-
-
--- Sends each a in α to left a and right a
-def split  (α : Type u) := (collapse α)ᵒ
-
-theorem split_collapse_eq_id {α : Type u}: eval (split α ▹ collapse α) = fun (a b: α ) => a = b  := by
-simp [split, eval, domain, codomain]
-
-
-
-
-
--- This is a notion from Peirce/Tarski of a second sequential composition operation that is the logical dual of ordinary composition. It replaces the  existential quantifier (∃) in the definition of composition with a universal quantifier (∀) and replaces conjunction (∧) with disjunction (∨). It can be defined by a De Morgan equivalence.
--- TODO: Add a proof that this compositional definition is equal to the direct logical definition.
-def relativeComp (R : Relation α β) (S :Relation β γ) :=  (R⁻▹S⁻)⁻
-
-theorem relative_comp_eval  {R: Relation α β }{S :Relation β γ} : eval (relativeComp R S) = fun (a: α)(c: γ) => ∀(b: β), eval R a b ∨ eval S b c := by
-simp [relativeComp, complement, eval, domain ]
-funext a b
-simp [eval]
-constructor <;> intro h ;
-  · simp [Classical.or_iff_not_imp_left]
-    exact h
-simp [Classical.or_iff_not_imp_left.symm]
-exact h
-
-
-
--- What is the tactic that expresses  ¬P → Q iff P o
-
 -- The converse complement of a relation is often refered to as the relative or linear negation of the relation. Note, that this is order invariant, i.e. complement converse = converse complemetn (proof below).
 def negation (R : Relation α β) := R⁻ᵒ
 abbrev neg (R : Relation α β) :=  R.negation
 postfix: 80 "ᗮ" => Relation.negation -- \^bot
-
--- In linear logic, ar (upside down &) is the DeMorgan dual of product.
-def par (R : Relation α β) (S : Relation γ δ) : Relation (α × γ) (β × δ) := (Rᗮ⊗Sᗮ)ᗮ
-
--- In linear logic, the operation with (&) is the DeMorgan dual of coproduct.
-def withR (R : Relation α β) (S : Relation γ δ) := (Rᗮ⊕Sᗮ)ᗮ
-
--- An empty relation is the complement of the full relation.
-def empty (α β : Type u) :=  (full α β)⁻
-
--- The identity relation is the composition of copy and merge
-def IdRel (α : Type u) := (copy α)▹(merge α)
--- TODO: add eval proof
-
--- The complement of identity is a relation consisting of all pairs of elements that are not identical.
-def nonId (α : Type u) := (IdRel α)⁻
-
---The (linear) negation of copy is a "different" relation that relates pairs in α × α of non-equal elements to every element in α. This is useful for compositionally removing reflexive pairs from a relation.
-def different (α: Type u) := (copy α)ᗮ
-
--- Residuation / Linear Implication
-def linImp (R S : Relation α β) := (Rᵒ▹S⁻)⁻
-abbrev linImpRight (R S : Relation α β) := linImp R S
-def linImpLeft (R S : Relation α β) := (S⁻▹Rᵒ)⁻
-
-namespace Relation
---NOTATION FOR Linear Implication
-  infixr : 50 "⊸" => linImp -- \multi
-  infixl : 50 "⟜" => linImpLeft
-
-end Relation
-
--- *** Simplification Theorems ***
-
--- TODO: Use notation in defining the theorems to make them easier to read.
 
 -- Double converse equals original relation
 @[simp]
@@ -236,28 +167,96 @@ theorem complement_converse_to_neg (R : Relation α β) : eval (complement (conv
   simp [eval, neg]
 
 
+-- Merge is the converse of copy
+def merge (α) := (copy α)ᵒ
+
+-- The identity relation is the composition of copy and merge
+def idR (α : Type u) := (copy α)▹(merge α)
+
+-- Proves evaluation of copy then merge equals identity pairs.
+@[simp]
+theorem eval_idR {α : Type u}: eval (copy α ▹ merge α) = fun (a b: α ) => a = b  := by
+simp [merge, eval]
+
+-- Split is the converse of collapse. It branches α into two disjoint copies relating each element x to both inl x and inr x.
+def split  (α : Type u) := (collapse α)ᵒ
+
+-- Proves evaluation of split then collapse is evalutes the same as idR
+@[simp]
+theorem eval_split_collapse_eq_idR {α : Type u}: eval (split α ▹ collapse α) = eval (Relation.idR α)  := by
+simp [split, eval]
+
+
+-- The complement of identity is a relation consisting of all pairs of elements that are not identical.
+def nonId (α : Type u) := (idR α)⁻
+
+-- nonId relates two elements iff,  they are not equal
+theorem eval_nonId_iff {α : Type u} (a a': α ) : eval (nonId α) a a' ↔ a ≠ a' := by simp [nonId, eval]
+
+
+--The (linear) negation of copy is a "different" relation that relates pairs in α × α of non-equal elements to every element in α. It relates equal elements (a,a) to every element not equal to a. This is useful for compositionally removing reflexive pairs from a relation.
+def different (α: Type u) := (copy α)ᗮ
+
+
+
+-- This is a notion from Peirce/Tarski of a second sequential composition operation that is the logical dual of ordinary composition. It replaces the  existential quantifier (∃) in the definition of composition with a universal quantifier (∀) and replaces conjunction (∧) with disjunction (∨). It can be defined by a De Morgan equivalence.
+-- TODO: Add a proof that this compositional definition is equal to the direct logical definition.
+def relativeComp (R : Relation α β) (S :Relation β γ) :=  (R⁻▹S⁻)⁻
+
+@[simp]
+theorem eval_relative_comp  {R: Relation α β }{S :Relation β γ} : eval (relativeComp R S) = fun (a: α)(c: γ) => ∀(b: β), eval R a b ∨ eval S b c := by
+simp [relativeComp, complement, eval, domain ]
+funext a b
+simp [eval]
+constructor <;> intro h ;
+  · simp [Classical.or_iff_not_imp_left]
+    exact h
+simp [Classical.or_iff_not_imp_left.symm]
+exact h
+
+
+
+-- In linear logic, ar (upside down &) is the DeMorgan dual of product.
+def par (R : Relation α β) (S : Relation γ δ) : Relation (α × γ) (β × δ) := (Rᗮ⊗Sᗮ)ᗮ
+
+-- In linear logic, the operation with (&) is the DeMorgan dual of coproduct.
+def withR (R : Relation α β) (S : Relation γ δ) := (Rᗮ⊕Sᗮ)ᗮ
+
+-- An empty relation is the complement of the full relation.
+def empty (α β : Type u) :=  (full α β)⁻
+
+
+
+-- Residuation / Linear Implication
+def linImp (R S : Relation α β) := (Rᵒ▹S⁻)⁻
+abbrev linImpRight (R S : Relation α β) := linImp R S
+def linImpLeft (R S : Relation α β) := (S⁻▹Rᵒ)⁻
+
+
+--NOTATION FOR Linear Implication
+  infixr : 50 "⊸" => linImp -- \multi
+  infixl : 50 "⟜" => linImpLeft
+
+
 -- Converse distributes over composition
 @[simp]
-theorem converse_comp (R : Relation α β) (S : Relation β γ) :
+theorem converse_comp_dist (R : Relation α β) (S : Relation β γ) :
   eval (converse (comp R S)) = eval (comp (converse S) (converse R)) := by
   apply funext; intro c; apply funext; intro a
   simp [Relation.eval]
   constructor <;> exact fun ⟨b, hab, hbc⟩ => ⟨b, hbc, hab⟩
 
--- TODO:
-  -- Complement distributes over composition?
-  -- Negation distributes over composition?
 
 -- Converse distributes across product
 @[simp]
-theorem converse_product (R : Relation α β) (S : Relation γ δ) :
+theorem converse_product_dist (R : Relation α β) (S : Relation γ δ) :
   eval (converse (product R S)) = eval (product (converse R) (converse S)) := by
   apply funext; intro ⟨b, d⟩; apply funext; intro ⟨a, c⟩
   simp [Relation.eval, Relation.product, Relation.converse]
 
 -- Complement distributes across product
 @[simp]
-theorem complement_product (R : Relation α β) (S : Relation γ δ) :
+theorem complement_product_dist (R : Relation α β) (S : Relation γ δ) :
   eval (complement (product R S)) = eval (par (complement R) (complement S)) := by
   apply funext; intro ⟨a, c⟩; apply funext; intro ⟨b, d⟩
   simp [Relation.eval]
@@ -274,11 +273,7 @@ theorem neg_product (R : Relation α β) (S : Relation γ δ) :
 theorem converse_coproduct (R : Relation α β) (S : Relation γ δ) :
   eval (converse (coproduct R S)) = eval (coproduct (converse R) (converse S)) := by
   apply funext; intro ab; apply funext; intro cd
-  cases ab <;> cases cd
-  . simp [Relation.eval]
-  . simp [Relation.eval]
-  . simp [Relation.eval]
-  . simp [Relation.eval]
+  cases ab <;> cases cd <;> simp [Relation.eval]
 
 --  Complement distributes across coproduct
 @[simp]
@@ -298,8 +293,6 @@ theorem assoc_comp (R : Relation α β) (S : Relation β γ) (T : Relation γ δ
     exact ⟨b, hab, ⟨c, hbc, hcd⟩⟩
   . intro ⟨b, hab, ⟨c, hbc, hcd⟩⟩
     exact ⟨c, ⟨b, hab, hbc⟩, hcd⟩
-
-
 
 
 abbrev EndoRelation (α: Type U) := Relation α α

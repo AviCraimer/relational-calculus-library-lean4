@@ -37,4 +37,7 @@ instance : Preorder (Relation α β) where
   le_trans := @Relation.le_trans _ _
 
 
+
 def Relation.Preorder := @instPreorderRelation
+
+def Relation.le {α β : Type u} := (@instLERelation α β).le

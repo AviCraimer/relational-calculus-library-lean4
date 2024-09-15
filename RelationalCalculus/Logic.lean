@@ -77,25 +77,25 @@ infixl : 80 " ⊆ " => subR
 
 -- Gets the left image relation of R. That is the subrelation of R that is a subrelation of id and connects the left image of R.
 def selectLeft {α β : Type u} (R : Relation α β) : Relation α α  :=
-  let id_α := IdRel α
+  let id_α := idR α
   R▹Rᵒ▹(id_α⁻▹R▹Rᵒ▹id_α⁻)⁻
 
--- theorem select_iff_leq_id {R : α β} : selectLeft R ≤ IdRel := by sorry
+-- theorem select_iff_leq_id {R : α β} : selectLeft R ≤ idR := by sorry
 
 -- Gets the right image
 def selectRight {α β : Type u} (R : Relation α β) : Relation β β  := selectLeft (Rᵒ)
 
 
--- Forall L, gets left selection and returns subset prop relations for if IdRel is subset of selection.
--- Recall that  a selection is always a subset of IdRel.
+-- Forall L, gets left selection and returns subset prop relations for if idR is subset of selection.
+-- Recall that  a selection is always a subset of idR.
 -- def totalImgL (R : Relation α β) : PropR :=
 --   let Left := selectLeft R
---   IdRel ⊆ Left
+--   idR ⊆ Left
 
 --
 -- def totalImgR (R : Relation α β) :PropR :=
 --   let Right := selectRight R
---   IdRel ⊆ Right
+--   idR ⊆ Right
 
 -- Checks that R is total on right and left images
 -- def totalImg (R : Relation α β) :PropR :=

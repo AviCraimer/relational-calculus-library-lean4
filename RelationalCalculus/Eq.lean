@@ -43,22 +43,6 @@ Equiv := Relation.eq
 namespace Relation
 -- *** Theorems Relating Order Equivalence to Evaluation Equality ***
 -- Our equivalence relation defined in terms of ordering actually implies equivalence in terms of evaluation. This is because we defined ordering in terms of evaluation (see Order.lean).
-theorem eval_eq_iff_eq {R S : Relation α β} : (eval R = eval S) ↔ (R ≃ S) := by
-  constructor
-  · intro h
-    constructor <;> rw [le_rel_iff_le_eval, h]
-  · intro h
-    unfold eq at h
-    apply funext
-    intro a
-    apply funext
-    intro b
-    apply propext
-    constructor
-    · exact (le_rel_iff_le_eval.mp h.left) a b
-    · exact (le_rel_iff_le_eval.mp h.right) a b
-
--- TODO: This theorem is very similar to eval_eq_iff_eq, do we need both of them?
 theorem eq_iff_eval_eq {R S : Relation α β} :
     R ≃ S ↔ (∀ a b, eval R a b ↔ eval S a b) := by
   constructor
@@ -71,6 +55,26 @@ theorem eq_iff_eval_eq {R S : Relation α β} :
       exact (h a b).1 hr
     · intro a b hs
       exact (h a b).2 hs
+
+
+-- This might be redundant. Commenting out for now
+-- theorem eval_eq_iff_eq {R S : Relation α β} : (eval R = eval S) ↔ (R ≃ S) := by
+--   constructor
+--   · intro h
+--     constructor <;> rw [le_rel_iff_le_eval, h]
+--   · intro h
+--     unfold eq at h
+--     apply funext
+--     intro a
+--     apply funext
+--     intro b
+--     apply propext
+--     constructor
+--     · exact (le_rel_iff_le_eval.mp h.left) a b
+--     · exact (le_rel_iff_le_eval.mp h.right) a b
+
+
+
 
 
 
