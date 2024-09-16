@@ -24,24 +24,38 @@ The documentation is just a sketch at this point. I'll work on filling it out ov
 ### [Basic.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Basic.lean)
 - Definition of `Relation` an inductive data type for terms of the relational calculus
 - Definition of `eval` to provide a semantic domain and the ability to use it for computation.
-- Definition of basic operations on relations
-- Various theorems
+- Definition of compositional operations on relations
+- Basic simplification theorems for relation expressions
+- Various other theorems
 
 ### [Order.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Order.lean)
-- Definition of a $\leq$ relation based on the lattice of sub-relations. Set theoretically this is just inclusion.
-- Typeclass instances for Setoid and Preorder
+- Definition of a $\leq$ relation based on inclusion under evaluation.
+- Typeclass instances for Preorder
 
 ### [Eq.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Eq.lean)
-- Defining equivalence between relations
-- Various related theorems
+- Defining equivalence between relatiions as R ≤ S ∧ S ≤ R
+- Type class instance for Setoid (equivalence relation)
+- Instance for HasEquiv type class
+- Notation using R ≈ S
+- Theorems to go back and forth from  R ≈ S to eval R = eval S
+
+### [Quotient.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Quotient.lean)
+- Definition of RelationQuotient as the type of relation expressions quotiented by equivalence class (≈)
+- Definitions of lifted constructors for idR (identity relation) and comp (sequential composition).
+- Theorems for identity composition and composition associativity (these are used to define the Category of Relations)
+
+### [Category.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Category.lean)
+- Definition of the category of relations (Rel) using RelationQuotient for the Hom type.
 
 ### [Union.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Union.lean)
-- Defining `union` operation on relations
-- Various theorems
+- Defining `union` operation on relations using relational composition.
+- Proof that `eval R ∪ S = eval R ∪ eval S`, i.e.,   evaluating this `union` is equal to evaluating set-theoretic union after evaluation.
+- Properties of union: associativity, transitivity, commutativity.
 
 ### [Intersection.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Intersection.lean)
 - Defining `intersection` operation on relations
-- Various theorems
+- WIP
+- Note: Most of these theorems should be derivable from `union` using the DeMorgan equivalence.
 
 ### [Logic.lean](https://github.com/AviCraimer/relational-calculus-library-lean4/blob/main/RelationalCalculus/Logic.lean)
 - Defining Propositions as Relations
