@@ -3,13 +3,13 @@ import RelationalCalculus.Basic
 import RelationalCalculus.Order
 import RelationalCalculus.Eq
 import Mathlib.Tactic
--- import Lean.Init.SimpLemmas
 open Relation
 
 
 --- *** Relational Union ***
 
 -- Compositional definition of union of relations. I should prove that this yeilds the set theoretic definition of union of pairs.
+@[match_pattern]
 def Relation.union (R : Relation α β) (S : Relation α β) := comp (comp (Relation.split α) (coproduct R S)) (collapse β)
 
 namespace Relation
@@ -29,7 +29,7 @@ simp [Relation.eval, union_pairs_def, Relation.union]
 
 theorem Relation.union_assoc {R S T : Relation α β} :
      ((R ∪ S) ∪ T) ≃ (R ∪ (S ∪ T)) := by
-rw [eq_iff_eval_eq]
+rw [eq_iff_forall_eval_eq]
 simp [union, eq, eval]
 intro a b
 have assoc :=  @or_assoc (R.eval a b) (S.eval a b) (T.eval a b)
@@ -59,7 +59,7 @@ theorem Relation.union_le {R S T : Relation α β} (hR : R ≤ T) (hS : S ≤ T)
 
 
 -- Proof that union is commutative.
-theorem Relation_union_comm  {α β : Type u } {R S : Relation α β } : (S ∪ R) ≃ (R ∪ S) := by
+theorem Relation.union_comm  {α β : Type u } {R S : Relation α β } : (S ∪ R) ≃ (R ∪ S) := by
 simp [eq]
 have RLeft :  R ≤ (R ∪ S) := union_left_le R S
 have RRight :  R ≤ (S ∪ R) := union_right_le R S

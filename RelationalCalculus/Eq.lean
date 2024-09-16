@@ -10,6 +10,7 @@ def eq (R S : Relation α β) : Prop :=
 -- Notation for extensional equality
 infix:50 " ≃ " => eq
 
+
 -- *** Equivalence Properties ***
 -- Reflexivity
 @[refl]
@@ -37,13 +38,16 @@ instance : Setoid (Relation α β) where
     trans := Relation.eq_trans
   }
 
+
 instance : HasEquiv (Relation α β) where
 Equiv := Relation.eq
+
+-- ... and so on for other constructors
 
 namespace Relation
 -- *** Theorems Relating Order Equivalence to Evaluation Equality ***
 -- Our equivalence relation defined in terms of ordering actually implies equivalence in terms of evaluation. This is because we defined ordering in terms of evaluation (see Order.lean).
-theorem eq_iff_eval_eq {R S : Relation α β} :
+theorem eq_iff_forall_eval_eq {R S : Relation α β} :
     R ≃ S ↔ (∀ a b, eval R a b ↔ eval S a b) := by
   constructor
   · intro h
@@ -56,6 +60,7 @@ theorem eq_iff_eval_eq {R S : Relation α β} :
     · intro a b hs
       exact (h a b).2 hs
 
+-- theorem eq_iff_eval_eq : R ≈ S ↔ (∀ a b, eval R a b ↔ eval S a b)
 
 -- This might be redundant. Commenting out for now
 -- theorem eval_eq_iff_eq {R S : Relation α β} : (eval R = eval S) ↔ (R ≃ S) := by
@@ -82,7 +87,7 @@ theorem eq_iff_eval_eq {R S : Relation α β} :
 theorem eq_to_eval {R S : Relation α β} (h : R ≃ S) :
     eval R = eval S := by
   funext a b
-  exact propext (Relation.eq_iff_eval_eq.1 h a b)
+  exact propext (Relation.eq_iff_forall_eval_eq.1 h a b)
 
 theorem eval_to_eq {R S : Relation α β} (h: eval R = eval S) : R ≃ S := by
   unfold eq

@@ -8,6 +8,7 @@ universe u v
 abbrev Relation.Pairs (α β : Type u) : Type u  := (a:α) → (b:β) → Prop
 
 -- The Relation inductive type gives the syntactic composition structure of relations. This defines the fundamental objects to be manipulated by the relational calculus.
+@[match_pattern]
 inductive Relation  : (Dom : Type u) → (Cod : Type u) → Type (u+1)
 -- atomic forms a relation directly from a set of pairs
 | atomic  {α β : Type u} (f:Relation.Pairs α β)  :  Relation α β
