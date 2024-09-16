@@ -38,17 +38,16 @@ def RelationQuotient.pair {α β : Type u} (a : α) (b : β) : RelationQuotient 
 
 def RelationQuotient.comp {α β γ : Type u} (R : RelationQuotient α β) (S : RelationQuotient β γ) : RelationQuotient α γ :=
   Quotient.lift₂ (fun R' S' => Quotient.mk _ (Relation.comp R' S')) (fun R S R' S' h1 h2 => Quotient.sound (by
-    sorry
-    -- simp [(·≈·), (·≤·), AntisymmRel]
-    -- constructor <;> intro a c <;>
-    -- simp [eval, domain] <;> intro b
-    -- · intro Reval Seval
-    --   use b
-    --   have R'eval:  R'.eval a b := by rw [h1.symm] at Reval
-    --   -- have S'eval:  S'.eval b c := by rw [h2.symm] at Reval
-    --   -- have S.eval b c :
-    -- · intro R'eval S'eval
-    --   use b
-
-
+    have RR'eval := eq_to_eval h1
+    have SS'eval := eq_to_eval h2
+    simp [(·≈·), (·≤·), AntisymmRel]
+    constructor <;> intro a c <;>
+    simp [eval, domain] <;> intro b
+    · intro Reval Seval
+      use b
+      rw [RR'eval.symm, SS'eval.symm]
+      exact ⟨Reval, Seval⟩
+    · intro R'eval S'eval
+      rw [RR'eval, SS'eval]
+      exact ⟨b, ⟨R'eval, S'eval ⟩⟩
   )) R S
