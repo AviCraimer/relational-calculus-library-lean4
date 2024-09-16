@@ -20,16 +20,16 @@ theorem bivaluedProps (R : PropR) (a b : {⋆}) : eval R a b = True ∨ eval R a
     simp
     exact Classical.em (eval R ⋆ ⋆)
 
-theorem biequivalentProps (R : PropR) : (R ≈ TrueR) ∨ (R ≈ FalseR) := by
-  rewrite [← eval_eq_iff_eq]
-  rw [or_iff_not_imp_left]
-  intro h
-  apply eval_to_eq
-  funext a b
-  simp [eval]
-  have bv :=  (bivaluedProps R a b)
-  exfalso
-  sorry
+-- theorem biequivalentProps (R : PropR) : (R ≈ TrueR) ∨ (R ≈ FalseR) := by
+--   rewrite [ eq_iff_forall_eval_eq ]
+--   rw [or_iff_not_imp_left]
+--   intro h
+--   apply eval_to_eq
+--   funext a b
+--   simp [eval]
+--   have bv :=  (bivaluedProps R a b)
+--   exfalso
+--   sorry
   -- TODO almost there!
 
 

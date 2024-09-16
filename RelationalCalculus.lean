@@ -3,6 +3,8 @@
 import RelationalCalculus.Basic
 import RelationalCalculus.Order
 import RelationalCalculus.Eq
+import RelationalCalculus.Quotient
+import RelationalCalculus.Category
 import RelationalCalculus.Union
 import RelationalCalculus.Intersection
 import RelationalCalculus.Logic
