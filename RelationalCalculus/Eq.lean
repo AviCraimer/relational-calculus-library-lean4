@@ -45,7 +45,7 @@ Equiv := Relation.eq
 namespace Relation
 -- *** Theorems Relating Order Equivalence to Evaluation Equality ***
 -- Our equivalence relation defined in terms of ordering actually implies equivalence in terms of evaluation. This is because we defined ordering in terms of evaluation (see Order.lean).
-theorem eq_iff_forall_eval_eq {R S : Relation α β} :
+theorem eq_iff_forall_eval_eq {α β : Type u} {R S : Relation α β} :
     R ≈ S ↔ (∀ a b, eval R a b ↔ eval S a b) := by
   constructor
   · intro h
@@ -57,28 +57,6 @@ theorem eq_iff_forall_eval_eq {R S : Relation α β} :
       exact (h a b).1 hr
     · intro a b hs
       exact (h a b).2 hs
-
--- theorem eq_iff_eval_eq : R ≈ S ↔ (∀ a b, eval R a b ↔ eval S a b)
-
--- This might be redundant. Commenting out for now
--- theorem eval_eq_iff_eq {R S : Relation α β} : (eval R = eval S) ↔ (R ≈ S) := by
---   constructor
---   · intro h
---     constructor <;> rw [le_rel_iff_le_eval, h]
---   · intro h
---     simp [(·≈·)] at h
---     apply funext
---     intro a
---     apply funext
---     intro b
---     apply propext
---     constructor
---     · exact (le_rel_iff_le_eval.mp h.left) a b
---     · exact (le_rel_iff_le_eval.mp h.right) a b
-
-
-
-
 
 
 -- Extentional equality implies evaluation equality
@@ -96,6 +74,31 @@ theorem eval_to_eq {R S : Relation α β} (h: eval R = eval S) : R ≈ S := by
   · intro a b hS
     rw [h]
     exact hS
+
+theorem eq_iff_eval_eq {R S : Relation α β}: R ≈ S ↔ (eval R = eval S) := by
+  exact ⟨eq_to_eval, eval_to_eq ⟩
+
+-- TO DELETE
+-- This was a much longer proof of same
+-- simp [(· ≈ · ),eq, (· ≤ · )]
+-- constructor
+-- · intro h1
+--   have RtoS := h1.1
+--   have StoR := h1.2
+--   have h2: ∀(a : α) (b : β), R.eval a b ↔ S.eval a b := by
+--    intro a b
+--    constructor
+--    · exact RtoS a b
+--    · exact StoR a b
+--   funext a b
+--   exact propext (h2 a b)
+-- · intro h1
+--   have h2 : ∀ a b, eval R a b ↔ eval S a b := by
+--     intro a b
+--     rw [h1]
+--   have h3 := eq_iff_forall_eval_eq.mpr h2
+--   exact h3
+
 
 end Relation
 
