@@ -8,6 +8,8 @@ def typeof {α : Sort u} (_:α) := α
 
 
 --- VECT ---
+
+-- I might remove this,  see:  Mathlib.Data.Vector
 inductive Vect :  Type u -> Nat -> Type (u+1) :=
  | emptyV (α:Type u) : Vect α 0
  | consV {n : Nat } (a: α) (v: Vect α n): Vect α (n + 1)
