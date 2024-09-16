@@ -16,25 +16,6 @@ def RelationQuotient.idR (α  : Type u) : RelationQuotient α α  :=
 def RelationQuotient.pair {α β : Type u} (a : α) (b : β) : RelationQuotient α β :=
   Quotient.mk _ (Relation.pair a b)
 
--- theorem comp_respects_equiv {α β γ : Type u} (R R' : Relation α β) (S S' : Relation β γ) : (R ▹ S) ≈ (R' ▹ S') := by
---   simp [(·≈·)]
---   constructor
---   · -- Prove (R ▹ S) ≤ (R' ▹ S')
---     intros a c h
---     simp [Relation.eval, Relation.comp] at *
---     rcases h with ⟨b, hr, hs⟩
---     use b
---     constructor
---     · exact h1.1 a b hr
---     · exact h2.1 b c hs
---   · -- Prove (R' ▹ S') ≤ (R ▹ S)
---     intros a c h
---     simp [Relation.eval, Relation.comp] at *
---     rcases h with ⟨b, hr, hs⟩
---     use b
---     constructor
---     · exact h1.2 a b hr
---     · exact h2.2 b c hs
 
 def RelationQuotient.comp {α β γ : Type u} (R : RelationQuotient α β) (S : RelationQuotient β γ) : RelationQuotient α γ :=
   Quotient.lift₂ (fun R' S' => Quotient.mk _ (Relation.comp R' S')) (fun R S R' S' h1 h2 => Quotient.sound (by
