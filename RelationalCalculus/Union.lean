@@ -28,9 +28,9 @@ intro b
 simp [Relation.eval, union_pairs_def, Relation.union]
 
 theorem Relation.union_assoc {R S T : Relation α β} :
-     ((R ∪ S) ∪ T) ≃ (R ∪ (S ∪ T)) := by
+     ((R ∪ S) ∪ T) ≈ (R ∪ (S ∪ T)) := by
 rw [eq_iff_forall_eval_eq]
-simp [union, eq, eval]
+simp [union, (·≈·), eval]
 intro a b
 have assoc :=  @or_assoc (R.eval a b) (S.eval a b) (T.eval a b)
 constructor <;> intro h1
@@ -59,8 +59,8 @@ theorem Relation.union_le {R S T : Relation α β} (hR : R ≤ T) (hS : S ≤ T)
 
 
 -- Proof that union is commutative.
-theorem Relation.union_comm  {α β : Type u } {R S : Relation α β } : (S ∪ R) ≃ (R ∪ S) := by
-simp [eq]
+theorem Relation.union_comm  {α β : Type u } {R S : Relation α β } : (S ∪ R) ≈ (R ∪ S) := by
+simp [(·≈·)]
 have RLeft :  R ≤ (R ∪ S) := union_left_le R S
 have RRight :  R ≤ (S ∪ R) := union_right_le R S
 have SLeft :  S ≤ (S ∪ R) := union_left_le S R

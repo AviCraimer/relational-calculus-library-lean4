@@ -20,7 +20,7 @@ theorem bivaluedProps (R : PropR) (a b : {⋆}) : eval R a b = True ∨ eval R a
     simp
     exact Classical.em (eval R ⋆ ⋆)
 
-theorem biequivalentProps (R : PropR) : (R ≃ TrueR) ∨ (R ≃ FalseR) := by
+theorem biequivalentProps (R : PropR) : (R ≈ TrueR) ∨ (R ≈ FalseR) := by
   rewrite [← eval_eq_iff_eq]
   rw [or_iff_not_imp_left]
   intro h
@@ -53,7 +53,7 @@ prefix: 83 "∃" => existsR
 
 
 -- TODO
-theorem not_exists_iff_empty (R : Relation α β) : ¬∃ R ≃ TrueR ↔  R ≃ empty α β := by
+theorem not_exists_iff_empty (R : Relation α β) : ¬∃ R ≈ TrueR ↔  R ≈ empty α β := by
   -- Convert to eval
   sorry
 
@@ -63,7 +63,7 @@ prefix: 83 "∀" => forAllR
 -- Note: I need to prove some more basic algeraic laws so I'm not always having to go back to eval.
 
 -- TODO
-theorem for_all_iff_full (R : Relation α β) : ∀ R ≃ TrueR ↔  R ≃ full α β := by sorry
+theorem for_all_iff_full (R : Relation α β) : ∀ R ≈ TrueR ↔  R ≈ full α β := by sorry
 
 -- We define a relational algebraic method of checking if relations are subsets using linear implication.
 def subR (S R : Relation α β) : PropR :=
@@ -72,7 +72,7 @@ def subR (S R : Relation α β) : PropR :=
 infixl : 80 " ⊆ " => subR
 
 -- TODO
--- theorem sub_rel_iff_leq {S R : Relation α β} : S ⊆ R ≃ TrueR ↔ S ≤ R := sorry
+-- theorem sub_rel_iff_leq {S R : Relation α β} : S ⊆ R ≈ TrueR ↔ S ≤ R := sorry
 
 
 -- Gets the left image relation of R. That is the subrelation of R that is a subrelation of id and connects the left image of R.

@@ -46,14 +46,14 @@ constructor <;> intro h
 
 -- DeMorgan Equivalence between intersection and union.
 -- This lets us translate theorems about union to corresponding theorems about intersection.
-theorem intersect_union_demorgan {α β : Type u} (R S: Relation α β) : (R ∩ S)  ≃  ((R⁻ ∪ S⁻)⁻) := by
-simp [eq, (·≤ ·), intersect_union_eval ]
+-- theorem intersect_union_demorgan {α β : Type u} (R S: Relation α β) : (R ∩ S)  ≈  ((R⁻ ∪ S⁻)⁻) := by
+-- simp [(·≈·), (·≤ ·), intersect_union_eval ]
 
--- TODO
-def intersect_union_convert   {α β : Type u} ( I: Relation α β ) : Relation α β  :=
-  match I with
-  | (intersect R S) => ((R⁻ ∪ S⁻)⁻)
-  | _ => I
+-- -- TODO
+-- def intersect_union_convert   {α β : Type u} ( I: Relation α β ) : Relation α β  :=
+--   match I with
+--   | (intersect R S) => ((R⁻ ∪ S⁻)⁻)
+--   | _ => I
 
 
 
