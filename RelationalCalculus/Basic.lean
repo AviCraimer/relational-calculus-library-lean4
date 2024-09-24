@@ -53,6 +53,7 @@ inductive Relation  : (Dom : Type u) → (Cod : Type u) → Type (u+1)
 | right (α β : Type u) : Relation α (Sum β α)
 
 
+
 open Relation
 namespace Relation
 
@@ -227,16 +228,6 @@ def withR (R : Relation α β) (S : Relation γ δ) := (Rᗮ⊕Sᗮ)ᗮ
 def empty (α β : Type u) :=  (full α β)⁻
 
 
-
--- Residuation / Linear Implication
-def linImp (R S : Relation α β) := (Rᵒ▹S⁻)⁻
-abbrev linImpRight (R S : Relation α β) := linImp R S
-def linImpLeft (R S : Relation α β) := (S⁻▹Rᵒ)⁻
-
-
---NOTATION FOR Linear Implication
-  infixr : 50 "⊸" => linImp -- \multi
-  infixl : 50 "⟜" => linImpLeft
 
 
 -- Converse distributes over composition
