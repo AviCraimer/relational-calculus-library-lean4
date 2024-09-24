@@ -78,28 +78,6 @@ theorem eval_to_eq {R S : Relation α β} (h: eval R = eval S) : R ≈ S := by
 theorem eq_iff_eval_eq {R S : Relation α β}: R ≈ S ↔ (eval R = eval S) := by
   exact ⟨eq_to_eval, eval_to_eq ⟩
 
--- TO DELETE
--- This was a much longer proof of same
--- simp [(· ≈ · ),eq, (· ≤ · )]
--- constructor
--- · intro h1
---   have RtoS := h1.1
---   have StoR := h1.2
---   have h2: ∀(a : α) (b : β), R.eval a b ↔ S.eval a b := by
---    intro a b
---    constructor
---    · exact RtoS a b
---    · exact StoR a b
---   funext a b
---   exact propext (h2 a b)
--- · intro h1
---   have h2 : ∀ a b, eval R a b ↔ eval S a b := by
---     intro a b
---     rw [h1]
---   have h3 := eq_iff_forall_eval_eq.mpr h2
---   exact h3
-
-
 end Relation
 
 def Relation.Setoid := @instSetoidRelation
