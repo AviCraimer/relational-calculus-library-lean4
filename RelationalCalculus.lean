@@ -7,4 +7,5 @@ import RelationalCalculus.Quotient
 import RelationalCalculus.Category
 import RelationalCalculus.Union
 import RelationalCalculus.Intersection
-import RelationalCalculus.Logic
+import RelationalCalculus.Logic.Basic
+import RelationalCalculus.Logic.Metalogic
