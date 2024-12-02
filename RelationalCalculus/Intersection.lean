@@ -65,18 +65,25 @@ constructor <;> intro h
 -- apply funext
 
 
+-- TODO: I think this might be wrong. Might be better to define subtraction in the Inclusion.lean.
+-- -- Compositional Definition of Subtraction one relation from another.
+-- def subtract {α β : Type u} (R S : Relation α β) : Relation α β :=
+--   let D := (R ∩ S)ᗮ
+--   let Disconnected := D▹R▹D
+--   Disconnectedᵒ
 
--- Compositional Definition of Subtraction one relation from another.
-def subtract {α β : Type u} (R S : Relation α β) : Relation α β :=
-  let D := (R ∩ S)ᗮ
-  let Disconnected := D▹R▹D
-  Disconnectedᵒ
 
+-- infixl: 60 "-" => subtract --
 
-infixl: 60 "⊖" => subtract -- \ominus
-
--- TODO: Prove the composition definition of subtraction works as expected under evaluation
-theorem subtract_eval {α β : Type u} (R S : Relation α β)(a:α)(b:β): (eval (R⊖S) a b) ↔ (eval R a b) ∧ ¬(eval S a b) := sorry
+-- -- TODO: Prove the composition definition of subtraction works as expected under evaluation
+-- theorem subtract_eval {α β : Type u} {R S : Relation α β} : ∀(a: α)(b:β),(eval (R-S) a b) =  ((eval R a b) → ¬(eval S a b)) := by
+--  simp [eval,domain,codomain]
+--  intro a b
+--  constructor
+--  · intro h Rab
+--    rcases h with ⟨b1,⟨ a1, ⟨RnSa1b, Ra1b1⟩ ⟩, RnSab1⟩
+--      · sorry
+--    · sorry
 
 
 end Relation

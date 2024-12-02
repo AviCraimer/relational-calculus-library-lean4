@@ -11,7 +11,12 @@ namespace Relation
 
 def isPartialId {α :Type u} (R: Relation α α) : Prop := R ≤ (idR α)
 
-def isNonEmpty {α β :Type u} (R: Relation α β ) : Prop := ¬ R ≤ (empty α β)
+def isEmpty {α β :Type u} (R: Relation α β) := R ≈ (empty α β)
+
+@[simp]
+theorem empty_simp {α β :Type u} {R: Relation α β } : isEmpty R = (R ≤ (empty α β)) := by simp [isEmpty, (·≤·), (·≈·), eq, eval]
+
+def isNonEmpty {α β :Type u} (R: Relation α β ) : Prop := ¬ isEmpty R
 -- Define an element relation
 
 def isMinimal {α β :Type u} (R: Relation α β ) : Prop := R ≈ (R▹(full β α)▹R)

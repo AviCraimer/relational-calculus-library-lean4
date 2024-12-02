@@ -38,7 +38,7 @@ inductive Relation  : (Dom : Type u) → (Cod : Type u) → Type (u+1)
 | copy (α : Type u) : Relation α (α × α)
 
 -- Collapse is the categorical dual of copy (a.k.a. cocopy).  It relates every left and right values of a sum type α + α  to equal values in α. This allows us to collapse the disjoint sets of the sum type into a single set. Among other things, this operation allows us to define a union operation compositonally. The converse is a "split" relation that splits a single value into two parallel copies in the disjoint sets.
-|   collapse (α: Type u) : Relation (Sum α α) α
+| collapse (α: Type u) : Relation (Sum α α) α
 
 -- First is a projection relation from a pair in the domain to the first member of the pair. The converse inserts a value into all pairs where it occurs in first position.
 | first (α β : Type u) : Relation (α × β) α
@@ -50,7 +50,7 @@ inductive Relation  : (Dom : Type u) → (Cod : Type u) → Type (u+1)
 | left (α β : Type u) : Relation α (Sum α β)
 
 -- Right is an injection relation from a value to itself in the right side of a sum type. The converse is a kind of second projection that works with Sum types.
-| right (α β : Type u) : Relation α (Sum β α)
+| right (α β : Type u) : Relation β  (Sum α β)
 
 
 
@@ -188,26 +188,30 @@ def split  (α : Type u) := (collapse α)ᵒ
 theorem eval_split_collapse_eq_idR {α : Type u}: eval (split α ▹ collapse α) = eval (Relation.idR α)  := by
 simp [split, eval]
 
-
 -- The complement of identity is a relation consisting of all pairs of elements that are not identical.
 def nonId (α : Type u) := (idR α)⁻
+
+-- Prove that taking the linear negation of IdR is the same as nonId
+theorem nonId_neg_idR  {α : Type u}: eval (nonId α) = eval (neg (idR α)) := by sorry
+-- We need to prove that idR is symetric on its arguments and use this.
+
 
 -- nonId relates two elements iff,  they are not equal
 theorem eval_nonId_iff {α : Type u} (a a': α ) : eval (nonId α) a a' ↔ a ≠ a' := by simp [nonId, eval]
 
-
 --The (linear) negation of copy is a "different" relation that relates pairs in α × α of non-equal elements to every element in α. It relates equal elements (a,a) to every element not equal to a. This is useful for compositionally removing reflexive pairs from a relation.
 def different (α: Type u) := (copy α)ᗮ
 
-
-
 -- This is a notion from Peirce/Tarski of a second sequential composition operation that is the logical dual of ordinary composition. It replaces the  existential quantifier (∃) in the definition of composition with a universal quantifier (∀) and replaces conjunction (∧) with disjunction (∨). It can be defined by a De Morgan equivalence.
--- TODO: Add a proof that this compositional definition is equal to the direct logical definition.
-def relativeComp (R : Relation α β) (S :Relation β γ) :=  (R⁻▹S⁻)⁻
+-- Also called "par"
+def relativeSum (R : Relation α β) (S :Relation β γ) :=  (R⁻▹S⁻)⁻
+
+infixl:40 " ▶ " => relativeSum -- ? Not sure how to type it
+
 
 @[simp]
-theorem eval_relative_comp  {R: Relation α β }{S :Relation β γ} : eval (relativeComp R S) = fun (a: α)(c: γ) => ∀(b: β), eval R a b ∨ eval S b c := by
-simp [relativeComp, complement, eval, domain ]
+theorem eval_relative_comp  {R: Relation α β }{S :Relation β γ} : eval (relativeSum R S) = fun (a: α)(c: γ) => ∀(b: β), eval R a b ∨ eval S b c := by
+simp [relativeSum, complement, eval, domain ]
 funext a b
 simp [eval]
 constructor <;> intro h ;
@@ -217,8 +221,8 @@ simp [Classical.or_iff_not_imp_left.symm]
 exact h
 
 
-
 -- In linear logic, ar (upside down &) is the DeMorgan dual of product.
+-- TODO: Need to check the name, not sure if it's called par.
 def par (R : Relation α β) (S : Relation γ δ) : Relation (α × γ) (β × δ) := (Rᗮ⊗Sᗮ)ᗮ
 
 -- In linear logic, the operation with (&) is the DeMorgan dual of coproduct.
@@ -226,8 +230,6 @@ def withR (R : Relation α β) (S : Relation γ δ) := (Rᗮ⊕Sᗮ)ᗮ
 
 -- An empty relation is the complement of the full relation.
 def empty (α β : Type u) :=  (full α β)⁻
-
-
 
 
 -- Converse distributes over composition
@@ -285,6 +287,7 @@ theorem assoc_comp (R : Relation α β) (S : Relation β γ) (T : Relation γ δ
     exact ⟨b, hab, ⟨c, hbc, hcd⟩⟩
   . intro ⟨b, hab, ⟨c, hbc, hcd⟩⟩
     exact ⟨c, ⟨b, hab, hbc⟩, hcd⟩
+
 
 
 abbrev EndoRelation (α: Type U) := Relation α α

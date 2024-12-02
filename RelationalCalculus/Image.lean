@@ -15,39 +15,40 @@ universe u
 
 -- Deeply a work in progress. Not useful yet.
 namespace Relation
--- Gets the left image relation of R. That is the subrelation of R that is a subrelation of id and connects the left image of R.
-def imgLeft {α β : Type u} (R : Relation α β) : Relation α α  :=
-  let id_α := idR α
-  R▹Rᵒ▹(id_α⁻▹R▹Rᵒ▹id_α⁻)⁻
+open Relation
+-- Gets the image relation of R. That is the subrelation of identity β which includes elements that are second in pairs in R.
+def img {α β : Type u} (R : Relation α β) : Relation β β   :=
+  (Rᵒ▹ full α α ▹ R) ∩ (idR β )
 
--- theorem select_iff_leq_id {R : α β} : selectLeft R ≤ idR := by sorry
+abbrev imgCod {α β : Type u} (R : Relation α β) := img R
 
-
-
--- Gets the right image
-def imgRight {α β : Type u} (R : Relation α β) : Relation β β  := imgLeft (Rᵒ)
+-- Gets the domain image of R.
+def imgDom {α β : Type u} (R : Relation α β) : Relation α α  := img (Rᵒ)
 
 
--- Note: I'm starting to think my definition might have been wrong.
--- theorem img_sub_id {α β : Type u} (R: Relation α β ) : (imgLeft R) ≤ (idR α) := by
--- simp [(· ≤·), imgLeft, eval, domain, codomain]
--- intro a1 a2 a3 b a1Rb a3Rb h1
--- have h2 := h1 a3 b a1
--- have h3 := h1 a1 b a2
--- have h4 := h1 a3 b a2 -- got for contra
--- have h5 := h1 a2 b a1
--- have h6 := h1 a2 b a3 -- trival
--- have h7 := h1 a1 b a3 -- trival
+-- We define the evaluation of the image of R as pairs directly.
+def img_semantically {α β : Type u} (R : Relation α β) (b1 b2: β ) : Prop  :=  b1 = b2 ∧  ∃(a:α), R.eval a b1
 
--- -- have h4' : (¬a3 = a2 ∧ R.eval a2 b ∧ R.eval a3 b) → a3 = a2 := by
--- --   intro conj
--- --   obtain ⟨x1, ⟨ x2 , x3⟩ ⟩  := conj
--- --   exact h4 x1 x2 x3
--- have not_a2Rb : ¬(eval R a2 b) := by
---   by_contra a2Rb
---   -- have h4Conseq : (R.eval a2 b → R.eval a3 b → a3 = a2) -> a3 = a2 := by
---   --   intro ante
---   --   exact ante a2Rb a3Rb
---   have contra : ¬a3 = a2 → a3 = a2 := by
---     intro ante
---     exact h4 ante a2Rb a3Rb
+
+theorem img_eval {α β : Type u} (R : Relation α β):  (img R).eval  = R.img_semantically := by
+  simp [eval,  domain, codomain]
+  funext b1 b2
+  simp [img_semantically]
+  constructor
+  · intro h
+    rcases h with ⟨a, ⟨_, h1⟩, h2⟩
+    constructor
+    · exact h1
+    · let h3 := h2.right
+      rcases h2 with ⟨b, hb ⟩
+      rw [h1.symm] at h3
+      exact h3
+  · intro h
+    rcases h with ⟨heq, ⟨a, ha⟩⟩
+    exists b1
+    constructor
+    · exact ⟨ rfl,heq ⟩
+    · constructor
+      · exists a
+      · exists a
+        rwa [heq.symm]

@@ -80,5 +80,5 @@ theorem eq_iff_eval_eq {R S : Relation α β}: R ≈ S ↔ (eval R = eval S) := 
 
 end Relation
 
-def Relation.Setoid := @instSetoidRelation
-def Relation.HasEquiv := @instHasEquivRelation
+def Relation.instSetoid := @instSetoidRelation
+def Relation.instHasEquiv := @instHasEquivRelation

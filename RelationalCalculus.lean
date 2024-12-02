@@ -7,4 +7,6 @@ import RelationalCalculus.Quotient
 import RelationalCalculus.Category
 import RelationalCalculus.Union
 import RelationalCalculus.Intersection
+import RelationalCalculus.Elements
+import RelationalCalculus.Residuals
 import RelationalCalculus.Logic

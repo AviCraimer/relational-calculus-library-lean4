@@ -7,7 +7,18 @@ open Relation
 namespace Relation
 
 -- A left residual candidate is any relation that solves the inequality (R▹X) ≤ S
+-- NOTE: I could call this "residual" and call the other "coresidual"
 def leftResidualCandidate {α β : Type u} (R S: Relation α β) :=  {X: Relation β  β | (R▹X) ≤ S }
+
+--- R ▹ X ≤ S
+-- Schroder equialences
+-- R▹X ≤ S ≃ X ≤ R⊸S ≃ R ≤ S⟜X
+
+-- Definitions of (Left??) Residual
+-- R⊸S = Rᗮ ▶ S = (Rᵒ▹S⁻)⁻
+
+-- Key thing to prove
+-- R▹(R⊸S) ≤ S
 
 -- A left residual is a left residual candidate that is greater or equal to all candidates.
 def leftResiduals {α β : Type u} (R S: Relation α β) :=  {X: Relation β β | X ∈ (leftResidualCandidate R S) ∧ ∀ (Y: (leftResidualCandidate R S)), Y ≤ X }
@@ -30,9 +41,19 @@ theorem leftResidualsEquiv {α β : Type u} (R S: Relation α β) :
     have h_X'_in_candidate : X' ∈ R.leftResidualCandidate S := h_X'.left
     exact h_X.right ⟨X', h_X'_in_candidate⟩
 
+def linImp (R S : Relation α β): Relation β β  := (Rᵒ▹S⁻)⁻
+abbrev leftResidual (R S : Relation α β) := linImp R S
+def rightResidual (R S : Relation α β) := (S⁻▹Rᵒ)⁻
+
+--NOTATION FOR Linear Implication
+  infixr : 50 "⊸" => linImp -- \multi
+  infixl : 50 "⟜" => rightResidual
+
+
+
 
 -- The composition ((Rᵒ▹S⁻)⁻) which defines linear implication, gives us a left residual for R and S
-theorem lin_imp_left_residual {α β : Type u} (R S: Relation α β): ((Rᵒ▹S⁻)⁻) ∈ (leftResiduals R S) := by
+theorem lin_imp_left_residual {α β : Type u} (R S: Relation α β): (R ⊸ S) ∈ (leftResiduals R S) := by
   let X := ((Rᵒ▹S⁻)⁻)
   -- First, show that X ∈ leftResidualCandidate R S
   have h1 : (R ▹ X) ≤ S := by
@@ -83,13 +104,6 @@ theorem lin_imp_left_residual {α β : Type u} (R S: Relation α β): ((Rᵒ▹S
 
 -- TODO: Prove the analogous theorem for right residual.
 
-def linImp (R S : Relation α β): Relation β β  := (Rᵒ▹S⁻)⁻
-abbrev leftResidual (R S : Relation α β) := linImp R S
-def rightResidual (R S : Relation α β) := (S⁻▹Rᵒ)⁻
-
---NOTATION FOR Linear Implication
-  infixr : 50 "⊸" => linImp -- \multi
-  infixl : 50 "⟜" => rightResidual
 
 theorem lin_imp_le {α β : Type u} (R S: Relation α β) : ((R ⊸ S) ≈ full β β) → R ≤ S := by
 intro h

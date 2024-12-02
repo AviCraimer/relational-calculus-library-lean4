@@ -10,17 +10,18 @@ open Relation
 
 -- Compositional definition of union of relations. I should prove that this yeilds the set theoretic definition of union of pairs.
 @[match_pattern]
-def Relation.union (R : Relation α β) (S : Relation α β) := comp (comp (Relation.split α) (coproduct R S)) (collapse β)
+def Relation.union (R : Relation α β) (S : Relation α β) :=  (split α) ▹ (R⊕S) ▹ (collapse β)
+
 
 namespace Relation
 infixl:50 "∪" => Relation.union
 end Relation
 
 -- We give the direct set-theoretic definition of a union of two relations.
-def Relation.union_pairs_def (R : Relation α β) (S : Relation α β) : Pairs α β  := fun a b => (eval R) a b ∨ (eval S) a b
+def Relation.union_pairs_def (R : Relation α β) (S : Relation α β) : Pairs α β  := fun a b => eval R a b ∨ eval S a b
 
 -- Proof that the compositional definition of union is equal to the set theoretic definiton.
-theorem Relation.union_eval_eq_pairs (R : Relation α β) (S : Relation α β) : eval (Relation.union R S) = union_pairs_def R S := by
+theorem Relation.union_eval_eq_pairs (R : Relation α β) (S : Relation α β) : eval (R ∪ S) = union_pairs_def R S := by
 apply funext
 intro a
 apply funext
