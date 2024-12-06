@@ -1,4 +1,3 @@
-
 import RelationalCalculus.Basic
 import RelationalCalculus.Order
 import RelationalCalculus.Eq
@@ -69,3 +68,51 @@ have SRight :  S ≤ (R ∪ S) := union_right_le S R
 have SR_le_RS := union_le  SRight RLeft
 have RS_le_SE := union_le RRight SLeft
 exact ⟨SR_le_RS, RS_le_SE⟩
+
+
+-- Composition on the left distributes over union.
+theorem comp_intersect_dist_left  {α β γ: Type u} (R: Relation α β)(S T: Relation β γ ): (R▹(S ∪ T)) ≈   ((R▹S) ∪ (R▹T)) := by
+  simp [(·≈· ),eq,(·≤·), eval, domain, codomain]
+  constructor
+  · intro a c b Rab  S_or_Tbc
+    cases S_or_Tbc with
+    | inl Sbc =>
+      apply Or.inl
+      use b
+    | inr Tbc =>
+      apply Or.inr
+      use b
+  · intro a c h
+    cases h with
+    | inl E_RS =>
+      obtain ⟨b, Rab, Sbc⟩ := E_RS
+      use b
+      simp_all
+    | inr E_RT =>
+      obtain ⟨b, Rab, Tbc⟩ := E_RT
+      use b
+      simp_all
+
+
+-- Composition on the right distributes over union.
+theorem comp_intersect_dist_right  {α β γ: Type u} (S T: Relation α  β  ) (R: Relation β  γ ): ((S ∪ T)▹R) ≈ ((S▹R) ∪ (T▹R)) := by
+  simp [(·≈· ),eq,(·≤·), eval, domain, codomain]
+  constructor
+  · intro a c b S_or_Tab Rbc
+    cases S_or_Tab with
+    | inl Sab =>
+      apply Or.inl
+      use b
+    | inr Tac =>
+      apply Or.inr
+      use b
+  · intro a c E__SR_or_TR
+    cases E__SR_or_TR with
+    | inl E_SR =>
+      obtain ⟨b, ⟨Sab, Rbc⟩ ⟩ := E_SR
+      use b
+      simp_all
+    | inr E_TR =>
+      obtain ⟨b, ⟨Tab, Rbc⟩ ⟩ := E_TR
+      use b
+      simp_all

@@ -40,3 +40,29 @@ instance : Preorder (Relation α β) where
 def Relation.Preorder := @instPreorderRelation
 
 def Relation.le {α β : Type u} := (@instLERelation α β).le
+
+
+--- ORDER THEOREMS ---
+
+
+-- Left monotonicity: if S ≤ T then (R▹S) ≤ (R▹T)
+theorem comp_monotonic_left {α β γ: Type u} (R: Relation α β) (S T: Relation β γ)
+    (h: S ≤ T): (R▹S) ≤ (R▹T) := by
+  simp [(·≤·), eval, domain, codomain]
+  intro a c b Rab Sbc
+  use b
+  constructor
+  · exact Rab
+  · apply h
+    simp_all
+
+-- Right monotonicity: if S ≤ T then (S▹R) ≤ (T▹R)
+theorem comp_monotonic_right {α β γ: Type u} (S T: Relation α β) (R: Relation β γ)
+    (h: S ≤ T): (S▹R) ≤ (T▹R) := by
+  simp [(·≤·), eval, domain, codomain]
+  intro a c b Sab Rbc
+  use b
+  constructor
+  · apply h
+    simp_all
+  · exact Rbc

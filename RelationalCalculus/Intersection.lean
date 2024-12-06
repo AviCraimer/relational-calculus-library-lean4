@@ -2,9 +2,10 @@ import RelationalCalculus.Basic
 import RelationalCalculus.Order
 import RelationalCalculus.Eq
 import RelationalCalculus.Union
+import Mathlib.Tactic
 
 namespace Relation
-
+open Relation
 -- Compositional definition of intersection of relations.
 -- TODO: Maybe I can define this using duality with union. That way I can get theorems for free.
 @[match_pattern]
@@ -16,33 +17,69 @@ infixl: 50 "∩" => intersect
 def intersect_pairs_def (R : Relation α β) (S : Relation α β) : Pairs α β  := fun a b => (eval R) a b ∧ (eval S) a b
 
 -- Proof that the compositional definition of intersection is equal to the set theoretic definiton.
-theorem intersect_pairs_eq_eval (R : Relation α β) (S : Relation α β) : intersect_pairs_def R S = eval (R ∩ S)   := by
-  symm
-  apply funext
-  intro a
-  apply funext
-  intro b
-  simp [eval, intersect_pairs_def, intersect]
-  constructor <;> sorry
-  -- · intro ⟨a_1 b_1, ⟨ ⟨ aEqa1 , aEqb1⟩, ⟨Reval, Seval ⟩ ⟩ ⟩
-  --   subst ha1 ha2 hb1 hb2
-  --   exact ⟨hr, hs⟩
-  -- intro ⟨hr, hs⟩
-  -- use (b, b)
-  -- constructor
-  -- use (a, a)
-  -- constructor <;> rfl
+theorem intersect_eval_eq_pairs (R : Relation α β) (S : Relation α β) :  eval (R ∩ S) = intersect_pairs_def R S    := by
+  simp [eval,  intersect, domain, codomain]
+  funext a b
+  simp
+  constructor
+  · intro Eab
+    rcases Eab with ⟨a1, a2, ⟨ aEqa1, aEqa2⟩, Ra1b, Ra2b⟩
+    rw [aEqa2.symm] at Ra2b
+    rw [aEqa1.symm] at Ra1b
+    simp [intersect_pairs_def]
+    exact ⟨Ra1b, Ra2b⟩
+  · intro RinterS
+    simp [intersect_pairs_def] at RinterS
+    rcases RinterS with ⟨Rab, Sab⟩
+    use a
+    simp_all only [true_and, exists_eq_left']
 
 
-theorem intersect_union_eval {α β : Type u} (R S: Relation α β) : eval (R ∩ S) = eval ((R⁻ ∪ S⁻)⁻)  := by
-simp [intersect, union, complement, eval, domain, codomain]
-funext a c ; simp
-constructor <;> intro h
-· rcases h with ⟨a_1, b, ⟨ ⟨ a_eq_a1, a_eq_b ⟩, RandS ⟩⟩
-  rw [a_eq_a1.symm] at RandS
-  rw [a_eq_b.symm] at RandS
-  exact RandS
-· use a, a
+
+theorem intersect_union_eval {α β : Type u} (R S: Relation α β) : (R ∩ S) ≈  ((R⁻ ∪ S⁻)⁻)  := by
+  simp [(·≈·), eq,(·≤·), eval, domain, codomain]
+  constructor
+  · intro a b Rab Sab
+    simp_all only [and_self]
+  · intro a b Rab Sab
+    use a
+    simp_all only [true_and, exists_eq_left']
+
+#check imp_iff_not_or
+
+theorem union_intersect_eval {α β : Type u} (R S: Relation α β) : (R ∪ S) ≈  ((R⁻ ∩ S⁻)⁻)  := by
+  simp [(·≈·), eq,(·≤·), eval, domain, codomain]
+  constructor
+  · intro a b a_1 a_2
+    simp_all only [false_or]
+  · intro a b RS
+    rw [imp_iff_not_or, not_not] at RS
+    exact RS
+
+
+-- Composition on the leftis monotonic relative to composition
+theorem comp_intersect_le_left   {α β γ: Type u} (R: Relation α β)(S T: Relation β γ ): (R▹(S ∩ T)) ≤  ((R▹S) ∩ (R▹T)) := by
+  simp [(·≤·), eval, domain, codomain]
+  intro a c b Rab  Sbc Tbc
+  use a
+  simp_all only [true_and, exists_eq_left']
+  constructor <;> use b
+
+-- Composition on the right is monotonic relative to composition
+theorem comp_intersect_le_right  {α β γ: Type u} (S T: Relation α  β  ) (R: Relation β  γ ): ((S ∩ T)▹R) ≤  ((S▹R) ∩ (T▹R)) := by
+  simp [(·≤·), eval, domain, codomain]
+  intro a c b Sab Tab Rbc
+  use a
+  use a
+  constructor
+  · simp_all
+  · constructor <;> use b
+
+
+
+
+
+
 
 -- DeMorgan Equivalence between intersection and union.
 -- This lets us translate theorems about union to corresponding theorems about intersection.

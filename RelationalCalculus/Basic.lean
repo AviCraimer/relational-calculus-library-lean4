@@ -290,6 +290,7 @@ theorem assoc_comp (R : Relation α β) (S : Relation β γ) (T : Relation γ δ
 
 
 
+
 abbrev EndoRelation (α: Type U) := Relation α α
 
 end Relation
