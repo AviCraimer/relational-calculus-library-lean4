@@ -116,3 +116,16 @@ theorem comp_intersect_dist_right  {α β γ: Type u} (S T: Relation α  β  ) (
       obtain ⟨b, ⟨Tab, Rbc⟩ ⟩ := E_TR
       use b
       simp_all
+
+
+-- TODO:
+-- Union is contained in relative sum (both sides)
+theorem sum_union_le_left {α β γ: Type u} (R: Relation α β) (S T: Relation β γ):
+  ((R✦S) ∪ (R✦T)) ≤ (R✦(S ∪ T)) := by
+  sorry
+
+
+
+
+theorem sum_union_le_right {α β γ: Type u} (S T: Relation α β) (R: Relation β γ):
+  ((S✦R) ∪ (T✦R)) ≤ ((S ∪ T)✦R) := by sorry

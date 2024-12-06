@@ -75,6 +75,39 @@ theorem comp_intersect_le_right  {α β γ: Type u} (S T: Relation α  β  ) (R:
   · simp_all
   · constructor <;> use b
 
+-- Relative sum distributes over intersection (both sides)
+theorem sum_intersect_dist_left {α β γ: Type u} (R: Relation α β) (S T: Relation β γ):
+  (R✦(S ∩ T)) ≈ ((R✦S) ∩ (R✦T)) := by
+  simp_all [eval]
+  funext a c
+  simp
+  constructor
+  · intro nR_ST
+    use a
+    simp_all only [true_and, not_false_eq_true, implies_true, exists_eq_left']
+  · intro E b nR
+    obtain ⟨a2, a3, ⟨a_a2, a_a3 ⟩ , nRS, nRT⟩ := E
+    subst a_a2 a_a3
+    simp_all only [not_false_eq_true, and_self]
+
+
+
+theorem sum_intersect_dist_right {α β γ: Type u} (S T: Relation α β) (R: Relation β γ):
+  ((S ∩ T)✦R) ≈ ((S✦R) ∩ (T✦R)) := by
+  simp_all [eval]
+  funext a c
+  simp
+  constructor
+  · intro h
+    use a
+    simp_all only [true_and, false_implies, implies_true, exists_eq_left', not_false_eq_true]
+  · intro E
+    obtain ⟨a2, a3, ⟨a_a2, a_a3 ⟩ , nSR, nTR⟩ := E
+    subst a_a2 a_a3
+    intro b S_nT
+    by_cases h2:  S.eval a b
+    · simp_all only [true_implies, not_false_eq_true]
+    · simp_all only [false_implies, not_false_eq_true]
 
 
 
@@ -83,14 +116,32 @@ theorem comp_intersect_le_right  {α β γ: Type u} (S T: Relation α  β  ) (R:
 
 -- DeMorgan Equivalence between intersection and union.
 -- This lets us translate theorems about union to corresponding theorems about intersection.
--- theorem intersect_union_demorgan {α β : Type u} (R S: Relation α β) : (R ∩ S)  ≈  ((R⁻ ∪ S⁻)⁻) := by
--- simp [(·≈·), (·≤ ·), intersect_union_eval ]
+theorem intersect_union_demorgan {α β : Type u} {R S: Relation α β} : (R ∩ S)  ≈  ((R⁻ ∪ S⁻)⁻) := by
+  simp_all [eval]
+  funext a b
+  simp_all only [eq_iff_iff]
+  constructor
+  · intro E
+    obtain ⟨a2, a3,⟨a_a2, a_a3⟩, Ra2b, Sa3b⟩ := E
+    subst a_a2 a_a3
+    simp_all only [and_self]
+  · intro RS
+    obtain ⟨Rab, Sab⟩ := RS
+    use a
+    simp_all only [true_and, exists_eq_left']
 
--- -- TODO
--- def intersect_union_convert   {α β : Type u} ( I: Relation α β ) : Relation α β  :=
---   match I with
---   | (intersect R S) => ((R⁻ ∪ S⁻)⁻)
---   | _ => I
+
+theorem union_intersect_demorgan {α β : Type u} (R S: Relation α β) : (R ∪ S)  ≈  ((R⁻ ∩ S⁻)⁻) := by
+  simp [eval]
+  funext a b
+  simp_all only [eq_iff_iff]
+  constructor
+  · intro a_1 a_2
+    simp_all only [false_or]
+  · intro nRS
+    by_cases h: R.eval a b
+    <;> simp_all only [not_true_eq_false, false_implies, true_or]
+    simp_all only [not_false_eq_true, true_implies, or_true]
 
 
 

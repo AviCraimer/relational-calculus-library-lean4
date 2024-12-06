@@ -37,6 +37,8 @@ instance : Setoid (Relation α β) where
   }
 
 
+
+
 instance : HasEquiv (Relation α β) where
 Equiv := Relation.eq
 
@@ -45,8 +47,9 @@ Equiv := Relation.eq
 namespace Relation
 -- *** Theorems Relating Order Equivalence to Evaluation Equality ***
 -- Our equivalence relation defined in terms of ordering actually implies equivalence in terms of evaluation. This is because we defined ordering in terms of evaluation (see Order.lean).
+
 theorem eq_iff_forall_eval_eq {α β : Type u} {R S : Relation α β} :
-    R ≈ S ↔ (∀ a b, eval R a b ↔ eval S a b) := by
+    (R ≈ S) ↔ (∀ a b, eval R a b ↔ eval S a b) := by
   constructor
   · intro h
     intro a b
@@ -59,24 +62,19 @@ theorem eq_iff_forall_eval_eq {α β : Type u} {R S : Relation α β} :
       exact (h a b).2 hs
 
 
--- Extentional equality implies evaluation equality
-theorem eq_to_eval {R S : Relation α β} (h : R ≈ S) :
-    eval R = eval S := by
-  funext a b
-  exact propext (Relation.eq_iff_forall_eval_eq.1 h a b)
+-- Equivalence is equal to extensional equality
+@[simp]
+theorem equiv_eq_eval {R S : Relation α β}: (R ≈ S) = (eval R = eval S) := by
+  simp_all only [eq_iff_forall_eval_eq, eq_iff_iff]
+  apply Iff.intro
+  · intro RS
+    ext x x_1 : 3
+    simp_all only
+  · intro a a2 b
+    simp_all only
 
-theorem eval_to_eq {R S : Relation α β} (h: eval R = eval S) : R ≈ S := by
-  simp [(·≈·)]
-  constructor
-  · intro a b hR
-    rw [←h]
-    exact hR
-  · intro a b hS
-    rw [h]
-    exact hS
 
-theorem eq_iff_eval_eq {R S : Relation α β}: R ≈ S ↔ (eval R = eval S) := by
-  exact ⟨eq_to_eval, eval_to_eq ⟩
+
 
 end Relation
 

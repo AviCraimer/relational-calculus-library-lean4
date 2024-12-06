@@ -63,11 +63,13 @@ infixl:70 " ⊗ " => product -- \otimes
 infixl:60 " ⊕ " => coproduct -- \oplus
 infixl:40 " ▹ " => comp -- \trans
 
-@[reducible]
-def domain (_: Relation α β) := α
+@[simp]
+abbrev domain (_: Relation α β) := α
 
-@[reducible]
-def codomain (_: Relation α β) := β
+@[simp]
+abbrev codomain (_: Relation α β) := β
+
+
 
 -- *** Eval - Semantics for Relations ***
 -- eval defines the semantic domain of the Relation inductive type. It allows us to prove that different syntactic Relation are equal under evaluation.
@@ -192,7 +194,16 @@ simp [split, eval]
 def nonId (α : Type u) := (idR α)⁻
 
 -- Prove that taking the linear negation of IdR is the same as nonId
-theorem nonId_neg_idR  {α : Type u}: eval (nonId α) = eval (neg (idR α)) := by sorry
+theorem nonId_neg_idR  {α : Type u}: eval (nonId α) = eval  ((idR α)ᗮ) := by
+  simp [eval]
+  ext x x_1 : 3
+  constructor
+  <;> intro h
+  <;> apply Aesop.BuiltinRules.not_intro
+  <;> intro a
+  <;> subst a
+  <;> simp_all only [not_true_eq_false]
+
 -- We need to prove that idR is symetric on its arguments and use this.
 
 
@@ -204,14 +215,16 @@ def different (α: Type u) := (copy α)ᗮ
 
 -- This is a notion from Peirce/Tarski of a second sequential composition operation that is the logical dual of ordinary composition. It replaces the  existential quantifier (∃) in the definition of composition with a universal quantifier (∀) and replaces conjunction (∧) with disjunction (∨). It can be defined by a De Morgan equivalence.
 -- Also called "par"
-def relativeSum (R : Relation α β) (S :Relation β γ) :=  (R⁻▹S⁻)⁻
+def rSum {α β : Type u} (R : Relation α β) (S :Relation β γ) :=  (R⁻▹S⁻)⁻
 
-infixl:40 " ▶ " => relativeSum -- ? Not sure how to type it
-
+infixl:40 " ✦ " => rSum -- shortcut: \st4
 
 @[simp]
-theorem eval_relative_comp  {R: Relation α β }{S :Relation β γ} : eval (relativeSum R S) = fun (a: α)(c: γ) => ∀(b: β), eval R a b ∨ eval S b c := by
-simp [relativeSum, complement, eval, domain ]
+theorem rsum_notation_simp {R  : Relation α β} {S :Relation β γ} : (R ✦ S) =  (rSum R S) := by rfl
+
+@[simp]
+theorem eval_relative_comp  {R: Relation α β }{S :Relation β γ} : eval (rSum R S) = fun (a: α)(c: γ) => ∀(b: β), eval R a b ∨ eval S b c := by
+simp [rSum, complement, eval]
 funext a b
 simp [eval]
 constructor <;> intro h ;

@@ -36,6 +36,9 @@ instance : Preorder (Relation α β) where
   le_refl := Relation.le_refl
   le_trans := @Relation.le_trans _ _
 
+@[simp]
+def le_notation_simp {α β : Type u} {R S: Relation α β }  : (R ≤ S) = ∀ (a : α) (b : β), R.eval a b → S.eval a b:= by rfl
+
 
 def Relation.Preorder := @instPreorderRelation
 
@@ -66,3 +69,17 @@ theorem comp_monotonic_right {α β γ: Type u} (S T: Relation α β) (R: Relati
   · apply h
     simp_all
   · exact Rbc
+
+
+-- Monotonicity for relative sum
+theorem sum_monotonic_left {α β γ: Type u} (R: Relation α β) (S T: Relation β γ) (h: S ≤ T): (R✦S) ≤ (R✦T) := by
+  simp_all [eval]
+
+
+theorem sum_monotonic_right {α β γ: Type u} (S T: Relation α β) (R: Relation β γ) (h: S ≤ T): (S✦R) ≤ (T✦R) := by
+  simp_all [eval]
+  intro a c nS_R b nT
+  apply nS_R
+  apply Aesop.BuiltinRules.not_intro
+  intro Sab
+  simp_all only [not_true_eq_false]
