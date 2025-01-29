@@ -11,16 +11,65 @@ import Mathlib.Tactic
 open Relation
 
 
-@[simp]
-lemma product_congr  {α β γ δ : Type u}{ R R': Relation α β} {S S': Relation γ δ} (hR: R ≈ R') (hS: S ≈ S') : R⊗S  ≈ R'⊗S' := by
- simp [(· ≈ · ), eq, (· ≤ · ), eval]
- constructor <;> intro a c b d Rab Scd
- · constructor
-   · rwa [eq_to_eval hR.symm]
-   · rwa [eq_to_eval hS.symm]
- · constructor
-   · rwa [eq_to_eval hR]
-   · rwa [eq_to_eval hS]
+-- Combining Conditions -- this is exploratory! Not sure about any of it.
+
+theorem inequality_oplus  {α β : Type u}( R S R' S': Relation α β) : (R⊕R') ≤ S⊕S' ↔ R ≤ S ∧ R' ≤ S' := by
+simp
+apply Iff.intro
+· intro a
+  obtain ⟨left , right⟩ := a
+  constructor <;> intro a b Rab
+  · have h2 := left a
+    obtain ⟨left2, right2 ⟩ := h2
+    have h3 := left2 b
+
+  · sorry
+· intro a
+  obtain ⟨left, right⟩ := a
+  constructor
+  · intro a
+    constructor
+    · intro a_1 a_2
+      sorry
+    · intro b a_1
+      exact a_1
+  · intro b
+    constructor
+    · intro a a_1
+      exact a_1
+    · intro b_1 a
+      sorry
+
+
+-- theorem inequality_conjunction  {α β : Type u}( R S R' S': Relation α β) : R⊗R' ≤ S⊗S' ↔ R ≤ S ∨ R' ≤ S' := by
+--   simp [eval]
+--   constructor
+--   · intro h
+--     constructor
+--     · intro a b Rab
+--       have h1 := h a a b b Rab
+--     · sorry
+
+--   · sorry
+  -- · intro h
+  --   constructor
+  --   · intro a b Rab
+  --     have h2 := h a a b b
+  --     simp [eval] at h2
+  --     have h3 := h2 Rab
+
+  --   · intro a_1 b a_2
+  --     sorry
+  -- · intro a a_1 b a_2 b_1 a_3
+  --   obtain ⟨left, right⟩ := a
+  --   sorry
+
+
+
+
+
+-- CONGRUENCE THEOREMS
+
 
 @[simp]
 lemma coproduct_congr  {α β γ δ : Type u}{ R R': Relation α β} {S S': Relation γ δ} (hR: R ≈ R') (hS: S ≈ S') : (R⊕S)  ≈ (R'⊕S') := by
