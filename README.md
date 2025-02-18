@@ -1,6 +1,6 @@
 # Relational Calculus Library
 
-This is an open source Lean 4 Library with proves about data structures for working with the relational calculus.
+This is an open source Lean 4 Library with data structures and theorems for working with the relational calculus.
 
 The motivation of this is two-fold.
 
