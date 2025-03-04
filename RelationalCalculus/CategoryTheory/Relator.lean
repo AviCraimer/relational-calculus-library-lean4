@@ -174,6 +174,7 @@ def Subcategory.toRelator {C : Type u} [Category.{v} C] {D : Type u'} [Category.
     (h1: S.hom_subset (prod_to_hom (f₁, g₁))) (h2: S.hom_subset (prod_to_hom (f₂, g₂))) := S.comp_closure h1 h2
 
 
+-- Here we prove that relators from C to D are equivalent (isomorphic) to subcategories of the product category C × D. This is precisely analogous to how set-based relations are isomorphic to subsets of the Cartesian product. This supports the idea that Relators are a natural definition of relations between categories.
 def relatorEquivSubcategory {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] :
   Relator C D ≃ Subcategory (C × D) where
   toFun R := R.toSubcategory
