@@ -174,7 +174,7 @@ def relo_morph_comp {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D
   (R: Relator C D) (S: Relator D E) {c1 c3 : C} {e1 e3 : E} (f: c1 ⟶ c3) (h: e1 ⟶ e3) : Prop :=
   Nonempty (ReloCompData R S f h)
 
-theorem relo_morph_comp.condition {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {E : Type u''} [Category.{v''} E]  (R: Relator C D) (S: Relator D E) {c1 c3 : C} {e1 e3 : E} (f: c1 ⟶ c3) (h: e1 ⟶ e3) (hyp: relo_morph_comp R S f h) : preComp R S f h ∨  (∃ (c2: C)(e2:E)(f1: c1 ⟶ c2 )(f2: c2 ⟶ c3)(h1: e1 ⟶ e2 )(h2: e2 ⟶ e3)(ffEqf: f1≫f2 = f )(hhEqh: h1≫h2 = h), relo_morph_comp  R S f1 h1  ∧  relo_morph_comp R S f2 h2) := by
+theorem relo_morph_comp.condition {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {E : Type u''} [Category.{v''} E]  {R: Relator C D} {S: Relator D E} {c1 c3 : C} {e1 e3 : E} {f: c1 ⟶ c3} {h: e1 ⟶ e3} (hyp: relo_morph_comp R S f h) : preComp R S f h ∨  (∃ (c2: C)(e2:E)(f1: c1 ⟶ c2 )(f2: c2 ⟶ c3)(h1: e1 ⟶ e2 )(h2: e2 ⟶ e3)(ffEqf: f1≫f2 = f )(hhEqh: h1≫h2 = h), relo_morph_comp  R S f1 h1  ∧  relo_morph_comp R S f2 h2) := by
 
     by_cases preComp R S f h
     · left
@@ -258,12 +258,100 @@ def Relator.comp {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {
     use ReloCompData.comp R S (f1 ≫ f2) (h1 ≫ h2) f1 f2 h1 h2 rfl rfl data1 data2
 
 
+lemma Relator.rel_morph_to_preComp {C D E } [Category C] [Category D] [Category E]  {R : Relator C D} {S : Relator D E} {c1 c3 : C}{d1 d3: D} { e1 e3: E} {f:  c1  ⟶ c3 } {g: d1  ⟶ d3}{h: e1  ⟶ e3}(Rfg : R.rel_morph f g) (Sgh : S.rel_morph g h ):  preComp R S f h := by
+  simp ; use d1, d3, g
 
--- theorem Relator.comp_assocr  {C D E I} [Category C] [Category D] [Category E] [Category I] {c1 c3: C} {i1 i3: I} {f:  c1  ⟶ c3 } {j: i1  ⟶ i3}(R : Relator C D) (S : Relator D E) (T : Relator E I) : (R.comp S).comp T = R.comp (S.comp T)   := by
---   simp [comp]
---   apply And.intro
---   ·
---   · sorry
+lemma Relator.preComp_to_rel_morph {C D E } [Category C] [Category D] [Category E]  {R : Relator C D} {S : Relator D E} {c1 c3 : C} { e1 e3: E} {f:  c1  ⟶ c3 } {h: e1  ⟶ e3} (preCompST: preComp R S f h):  (R.comp S).rel_morph f h  := by
+  simp_all only [preComp, comp, relo_morph_comp]
+  exact Nonempty.intro (ReloCompData.base R S preCompST )
+
+-- Showing that composition of morphism relations are transitive and associative  for the base case.
+lemma Relator.morph_comp_base_case_trans_assoc  {C D E I} [Category C] [Category D] [Category E] [Category I] {i1 i3: I} {R : Relator C D} {S : Relator D E} {T : Relator E I}{c1 c3 : C} {d1 d3 : D} {e1 e3 : E} {f:  c1  ⟶ c3 }{g: d1 ⟶ d3}{h: e1 ⟶ e3} {j: i1  ⟶ i3}(Rfg : R.rel_morph f g)(Sgh : S.rel_morph g h) (Thj : T.rel_morph h j) : ((R.comp S).comp T).rel_morph f j ∧ (R.comp (S.comp T)).rel_morph f j := by
+  simp [comp]
+
+  -- RS side
+  let RS := R.comp S
+
+  have preCompRSfh : preComp R S f h := Relator.rel_morph_to_preComp Rfg Sgh
+
+  let dataRSfh : ReloCompData R S f h := ReloCompData.base R S preCompRSfh
+
+  have RSfh : (R.comp S).rel_morph f h := by exact Nonempty.intro dataRSfh
+
+  have preCompRS_Tfj : preComp RS T f j := Relator.rel_morph_to_preComp RSfh Thj
+
+  let dataRS_Tfj : ReloCompData RS T f j := ReloCompData.base RS T preCompRS_Tfj
+
+  -- ST side
+  let ST := S.comp T
+  have preCompRSgj : preComp S T g j := Relator.rel_morph_to_preComp Sgh Thj
+  let dataSTgj : ReloCompData S T g j := ReloCompData.base S T preCompRSgj
+  have STgj : (S.comp T).rel_morph g j := by exact Nonempty.intro dataSTgj
+  have preCompR_STfj : preComp R ST f j := Relator.rel_morph_to_preComp Rfg STgj
+  let dataR_STfj : ReloCompData R ST f j := ReloCompData.base R ST preCompR_STfj
+
+  constructor
+  · exact Nonempty.intro dataRS_Tfj
+  · exact Nonempty.intro dataR_STfj
+
+
+
+theorem Relator.rel_morp_assocr  {C D E I} [Category C] [Category D] [Category E] [Category I] {c1 c3: C} {i1 i3: I} (R : Relator C D) (S : Relator D E) (T : Relator E I){c1 c3 : C} {e1 e3 : E} {f:  c1  ⟶ c3 } {j: i1  ⟶ i3}   : ((R.comp S).comp T).rel_morph f j = (R.comp (S.comp T)).rel_morph f j  := by
+  let RS := R.comp S
+  let ST := S.comp T
+  simp only [eq_iff_iff]
+  constructor <;> intro hyp
+  · simp only [comp] at *
+    have hyp2 := relo_morph_comp.condition hyp
+    simp_all only [preComp, exists_and_left, exists_prop', nonempty_prop]
+
+    cases hyp2 with
+    | inl hBaseOuter =>
+      obtain ⟨e1, e3, h, RSfh, Thj⟩ :=   hBaseOuter
+      have hyp3 :=  relo_morph_comp.condition RSfh
+      simp [relo_morph_comp]
+
+
+      cases hyp3 with
+      | inl hBaseInner =>
+        obtain ⟨d1, d3, g, Rfg, Sgh⟩ :=  hBaseInner
+        have preCompST := Relator.rel_morph_to_preComp Sgh Thj
+        have STgj :=  Relator.preComp_to_rel_morph preCompST
+        have preCompR_ST : preComp R ST f j := Relator.rel_morph_to_preComp Rfg  STgj
+        have  data : ReloCompData R ST f j := ReloCompData.base R ST  preCompR_ST
+        exact Nonempty.intro data
+      | inr h_2 =>
+        -- obtain ⟨w, h_1⟩ := h_2
+        -- obtain ⟨w_1, h_1⟩ := h_1
+        -- obtain ⟨w_2, h_1⟩ := h_1
+        -- obtain ⟨w_3, h_1⟩ := h_1
+        -- obtain ⟨w_4, h_1⟩ := h_1
+        -- obtain ⟨left, right⟩ := h_1
+        -- obtain ⟨w_5, h_1⟩ := right
+        -- obtain ⟨left_1, right⟩ := h_1
+        -- obtain ⟨left_2, right⟩ := right
+        -- subst left_1 left_2
+        sorry
+
+
+
+    | inr h_1 =>
+      obtain ⟨w, h⟩ := h_1
+      obtain ⟨w_1, h⟩ := h
+      obtain ⟨w_2, h⟩ := h
+      obtain ⟨w_3, h⟩ := h
+      obtain ⟨w_4, h⟩ := h
+      obtain ⟨left, right⟩ := h
+      obtain ⟨w_5, h⟩ := right
+      obtain ⟨left_1, right⟩ := h
+      obtain ⟨left_2, right⟩ := right
+      subst left_1 left_2
+      sorry
+
+
+
+  · sorry
+
 
 
 
