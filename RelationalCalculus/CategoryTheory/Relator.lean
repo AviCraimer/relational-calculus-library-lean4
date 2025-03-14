@@ -206,15 +206,6 @@ theorem relo_morph_comp.condition {C : Type u} [Category.{v} C] {D : Type u'} [C
         · exact Nonempty.intro f2h2
 
 
-
-
-
-
--- Something isn't right here.
--- theorem relo_morph_comp.assocr  {C D E I} [Category C] [Category D] [Category E] [Category I] {c1 c3: C} {i1 i3: I}
---     (R : Relator C D) (S : Relator D E) (T : Relator E I) (f:  c1  ⟶ c3) (j: i1  ⟶ i3) : (relo_morph_comp (relo_morph_comp R S) T) = relo_morph_comp  R (relo_morph_comp S T)   := by
-
-
 def ReloCompData.identity_implies_rel_ob {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {E : Type u''} [Category.{v''} E]
   {R: Relator C D} {S: Relator D E} {c : C} {e : E}
   (data: ReloCompData R S (𝟙 c) (𝟙 e)) : relComp R.rel_ob S.rel_ob c e :=
@@ -261,9 +252,30 @@ def Relator.comp {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {
 lemma Relator.rel_morph_to_preComp {C D E } [Category C] [Category D] [Category E]  {R : Relator C D} {S : Relator D E} {c1 c3 : C}{d1 d3: D} { e1 e3: E} {f:  c1  ⟶ c3 } {g: d1  ⟶ d3}{h: e1  ⟶ e3}(Rfg : R.rel_morph f g) (Sgh : S.rel_morph g h ):  preComp R S f h := by
   simp ; use d1, d3, g
 
+def ReloCompData.rel_morph_to_data {C D E } [Category C] [Category D] [Category E]  {R : Relator C D} {S : Relator D E} {c1 c3 : C}{d1 d3: D} { e1 e3: E} {f:  c1  ⟶ c3 } {g: d1  ⟶ d3}{h: e1  ⟶ e3}(Rfg : R.rel_morph f g) (Sgh : S.rel_morph g h ):  ReloCompData R S f h := ReloCompData.base R S (Relator.rel_morph_to_preComp Rfg Sgh)
+
 lemma Relator.preComp_to_rel_morph {C D E } [Category C] [Category D] [Category E]  {R : Relator C D} {S : Relator D E} {c1 c3 : C} { e1 e3: E} {f:  c1  ⟶ c3 } {h: e1  ⟶ e3} (preCompST: preComp R S f h):  (R.comp S).rel_morph f h  := by
   simp_all only [preComp, comp, relo_morph_comp]
   exact Nonempty.intro (ReloCompData.base R S preCompST )
+
+
+-- I think this is wrong, since there might not be a common g, in the case where g1 and g2 split apart. However, working on this taught me about induction hypotheses. The key is that it is based on the goal! So it needs to be set up with the right goal.
+-- lemma Relator.rel_morph_preComp_to_ {C D E } [Category C] [Category D] [Category E]  {R : Relator C D} {S : Relator D E} {c1 c3 : C} { e1 e3: E} {f:  c1  ⟶ c3 } {h: e1  ⟶ e3} (data_RSfh: ReloCompData R S f h): ∃ (d1 d3:D) (g: d1⟶d3),  (R.rel_morph f g ∧ S.rel_morph g h) := by
+--     induction  data_RSfh  with
+--     | @base R S c1 c2 e1 e2 f h RSfh =>
+--           assumption
+
+--     | @comp c1 c3 e1 e3 R S f h c2 e2 f1 f2 h1 h2 ffEqf hhEqh f1h1 f2h2 =>
+--         rename_i f1h1_ih f2h2_ih
+--         obtain ⟨d1, d2, g1, Rf1g1, Sf1g1 ⟩ := f1h1_ih
+--         obtain ⟨d2', d3, g2, Rf2g2, Sf2g2 ⟩ := f2h2_ih
+--         use d1, d3
+--         by_cases d2Eq:  d2' = d2
+--         ·
+
+
+
+
 
 -- Showing that composition of morphism relations are transitive and associative  for the base case.
 lemma Relator.morph_comp_base_case_trans_assoc  {C D E I} [Category C] [Category D] [Category E] [Category I] {i1 i3: I} {R : Relator C D} {S : Relator D E} {T : Relator E I}{c1 c3 : C} {d1 d3 : D} {e1 e3 : E} {f:  c1  ⟶ c3 }{g: d1 ⟶ d3}{h: e1 ⟶ e3} {j: i1  ⟶ i3}(Rfg : R.rel_morph f g)(Sgh : S.rel_morph g h) (Thj : T.rel_morph h j) : ((R.comp S).comp T).rel_morph f j ∧ (R.comp (S.comp T)).rel_morph f j := by
@@ -271,24 +283,15 @@ lemma Relator.morph_comp_base_case_trans_assoc  {C D E I} [Category C] [Category
 
   -- RS side
   let RS := R.comp S
-
-  have preCompRSfh : preComp R S f h := Relator.rel_morph_to_preComp Rfg Sgh
-
-  let dataRSfh : ReloCompData R S f h := ReloCompData.base R S preCompRSfh
-
+  let dataRSfh : ReloCompData R S f h := ReloCompData.rel_morph_to_data Rfg Sgh
   have RSfh : (R.comp S).rel_morph f h := by exact Nonempty.intro dataRSfh
-
-  have preCompRS_Tfj : preComp RS T f j := Relator.rel_morph_to_preComp RSfh Thj
-
-  let dataRS_Tfj : ReloCompData RS T f j := ReloCompData.base RS T preCompRS_Tfj
+  let dataRS_Tfj : ReloCompData RS T f j := ReloCompData.rel_morph_to_data RSfh Thj
 
   -- ST side
   let ST := S.comp T
-  have preCompRSgj : preComp S T g j := Relator.rel_morph_to_preComp Sgh Thj
-  let dataSTgj : ReloCompData S T g j := ReloCompData.base S T preCompRSgj
+  let dataSTgj : ReloCompData S T g j := ReloCompData.rel_morph_to_data  Sgh Thj
   have STgj : (S.comp T).rel_morph g j := by exact Nonempty.intro dataSTgj
-  have preCompR_STfj : preComp R ST f j := Relator.rel_morph_to_preComp Rfg STgj
-  let dataR_STfj : ReloCompData R ST f j := ReloCompData.base R ST preCompR_STfj
+  let dataR_STfj : ReloCompData R ST f j := ReloCompData.rel_morph_to_data Rfg STgj
 
   constructor
   · exact Nonempty.intro dataRS_Tfj
@@ -309,44 +312,24 @@ theorem Relator.rel_morp_assocr  {C D E I} [Category C] [Category D] [Category E
     | inl hBaseOuter =>
       obtain ⟨e1, e3, h, RSfh, Thj⟩ :=   hBaseOuter
       have hyp3 :=  relo_morph_comp.condition RSfh
+      obtain ⟨ data_RSfh⟩ := RSfh
       simp [relo_morph_comp]
-
-
-      cases hyp3 with
-      | inl hBaseInner =>
-        obtain ⟨d1, d3, g, Rfg, Sgh⟩ :=  hBaseInner
-        have preCompST := Relator.rel_morph_to_preComp Sgh Thj
-        have STgj :=  Relator.preComp_to_rel_morph preCompST
-        have preCompR_ST : preComp R ST f j := Relator.rel_morph_to_preComp Rfg  STgj
-        have  data : ReloCompData R ST f j := ReloCompData.base R ST  preCompR_ST
-        exact Nonempty.intro data
-      | inr h_2 =>
-        -- obtain ⟨w, h_1⟩ := h_2
-        -- obtain ⟨w_1, h_1⟩ := h_1
-        -- obtain ⟨w_2, h_1⟩ := h_1
-        -- obtain ⟨w_3, h_1⟩ := h_1
-        -- obtain ⟨w_4, h_1⟩ := h_1
-        -- obtain ⟨left, right⟩ := h_1
-        -- obtain ⟨w_5, h_1⟩ := right
-        -- obtain ⟨left_1, right⟩ := h_1
-        -- obtain ⟨left_2, right⟩ := right
-        -- subst left_1 left_2
+      induction  data_RSfh with
+       | @base R S c1 c2 e1 e2 f h RSfh =>
+          simp [preComp] at RSfh
+          obtain ⟨d1, d2, g, Rfg, Sgh ⟩ := RSfh
+          have preCompST := Relator.rel_morph_to_preComp Sgh Thj
+          have STgj :=  Relator.preComp_to_rel_morph preCompST
+          have  data : ReloCompData R ST f j := ReloCompData.rel_morph_to_data Rfg  STgj
+          exact Nonempty.intro data
+       | @comp c1 c3 e1 e3 R S f h c2 e2 f1 f2 h1 h2 ffEqf hhEqh f1h1 f2h2 =>
+          rename_i f1h1_ih f2h2_ih
+          simp [relo_morph_comp] at f1h1_ih f2h2_ih
+    | inr hCompOuter  =>
+        simp [relo_morph_comp] at hCompOuter
+        obtain ⟨c2, i2, f1, f2, j1, RS_Tf1j1, j2, jjEqj, ffEqf, RS_Tf2j2⟩ := hCompOuter
+        -- I think I need to do induction now, but I should diagram it first to make sure I understand what is going on. Don't forget about the possible splitting of g.
         sorry
-
-
-
-    | inr h_1 =>
-      obtain ⟨w, h⟩ := h_1
-      obtain ⟨w_1, h⟩ := h
-      obtain ⟨w_2, h⟩ := h
-      obtain ⟨w_3, h⟩ := h
-      obtain ⟨w_4, h⟩ := h
-      obtain ⟨left, right⟩ := h
-      obtain ⟨w_5, h⟩ := right
-      obtain ⟨left_1, right⟩ := h
-      obtain ⟨left_2, right⟩ := right
-      subst left_1 left_2
-      sorry
 
 
 
