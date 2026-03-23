@@ -325,31 +325,29 @@ theorem Relator.rel_morp_assocr  {C D E I} [Category C] [Category D] [Category E
        | @comp c1 c3 e1 e3 R S f h c2 e2 f1 f2 h1 h2 ffEqf hhEqh f1h1 f2h2 =>
           rename_i f1h1_ih f2h2_ih
           simp [relo_morph_comp] at f1h1_ih f2h2_ih
+          sorry
     | inr hCompOuter  =>
         simp [relo_morph_comp] at hCompOuter
         obtain ⟨c2, i2, f1, f2, j1, RS_Tf1j1, j2, jjEqj, ffEqf, RS_Tf2j2⟩ := hCompOuter
         -- I think I need to do induction now, but I should diagram it first to make sure I understand what is going on. Don't forget about the possible splitting of g.
         sorry
-
-
-
   · sorry
 
 
 
 
-theorem ReloCompData.assocr  {C D E I} [Category C] [Category D] [Category E] [Category I] {c1 c3: C} {i1 i3: I} {f:  c1  ⟶ c3 } {j: i1  ⟶ i3}
+-- theorem ReloCompData.assocr  {C D E I} [Category C] [Category D] [Category E] [Category I] {c1 c3: C} {i1 i3: I} {f:  c1  ⟶ c3 } {j: i1  ⟶ i3}
     (R : Relator C D) (S : Relator D E) (T : Relator E I) (RS_T: ReloCompData (R.comp S) T f j) : Nonempty (ReloCompData R (S.comp T) f j)  := by
       rename_i catC catD catE catI
       simp [Relator.comp, relo_morph_comp] at RS_T
-      condition
+
 
       let ST := S.comp T
 
-      have f1: c1 ⟶ c2
-      have f2: c2 ⟶ c3
-      have j1: c2 ⟶ c3
-      have j1: c2 ⟶ c3
+      -- have f1: c1 ⟶ c2
+      -- have f2: c2 ⟶ c3
+      -- have j1: c2 ⟶ c3
+      -- have j1: c2 ⟶ c3
 
       let data : ReloCompData R ST f j := comp R ST f j f1 f2 j1 j2 ffEqf jjEqj f1j1 f2j2
 
@@ -372,197 +370,9 @@ theorem ReloCompData.assocr  {C D E I} [Category C] [Category D] [Category E] [C
           simp [Relator.comp, relo_morph_comp] at RSfh
           obtain ⟨data⟩ := RSfh
 
-
-
-
-
       | @comp  c1 c2 e1 e2 f h _ T f j f1 f2 j1 j2 ffEqf jjEqj f1j1 f2j2 => sorry
 
 
-
--- --- Associativity of Composition---
--- -- First, let's prove associativity of ordinary relation composition (for objects)
--- theorem relComp_assoc {α β γ δ} (R : α → β → Prop) (S : β → γ → Prop) (T : γ → δ → Prop) :
---   ∀ a d, relComp (relComp R S) T a d ↔ relComp R (relComp S T) a d := by
---   intro a d
---   simp [relComp]
---   constructor
---   · intro h
---     -- If we have intermediate objects b and c
---     obtain ⟨c, ⟨b, Rab, Sbc⟩, Tcd⟩ := h
---     -- Rearrange to show existence in the other order
---     use b, Rab, c, Sbc, Tcd
---   · intro h
---     -- If we have intermediate objects b and c
---     obtain ⟨b, Rab, c, Sbc, Tcd⟩ := h
---     -- Rearrange to show existence in the other order
---     use c, ⟨b, Rab, Sbc⟩, Tcd
-
-
--- theorem Relator.comp_assoc {C D E I} [Category C] [Category D] [Category E] [Category I]
---     (R : Relator C D) (S : Relator D E) (T : Relator E I) : (R.comp S).comp T = R.comp (S.comp T) := by
---     rename_i catC catD catE catI
---     simp [comp]
---     constructor
---     · have h := relComp_assoc R.rel_ob S.rel_ob T.rel_ob
---       ext c1 i1 : 3
---       simp_all only [relComp]
---     · simp [relo_morph_comp]
---       ext c1 c2 i1 i2 f1 k1
---       constructor
---       · intro h
---         obtain ⟨ data⟩ := h
---       -- We need to prove by induction on the data structure
---         induction data with
---         | base  hProp  =>
---           rename_i c3 c4 i3 i4 f2 k2
---           -- Get the intermediate morphism in E
---           obtain ⟨e1, e2, h1, rs_f2h1, t_h1k2⟩ := hProp
---           -- Unpack the RS relation
---           simp at rs_f2h1 t_h1k2
---           obtain ⟨rs_data⟩ := rs_f2h1
---           sorry
---         | comp R S f g f1 f2 g1 g2 eq1 eq2 rs_data1 rs_data2 ih1 ih2 => sorry
---               -- This is the case where RS relation is built from smaller parts
---               -- We need to recurse on both parts
---       · sorry
-
-
-
-
--- To use this to make a category, we define:
--- def RelatorCategory : Category Type where
---   -- Objects are categories
---   Hom C D := Relator C D  -- For categories C and D
---   id C := sorry  -- Identity relator
---   comp := Relator.comp
---   id_comp := sorry
---   comp_id := sorry
---   assoc C D E F R S T := Relator.comp_assoc R S T
-
-
--- @[match_pattern]
--- inductive ReloCompCandidate {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D]  {E : Type u''} [Category.{v''} E]  :
---     ∀ (R: Relator C D) (S: Relator D E){c1 c2 : C} {e1 e2 : E}, (c1 ⟶ c2) → (e1 ⟶ e2) → Type (max u u' u'' v v' v'')
--- | direct  {c1 c2 : C} {e1 e2 : E}  (R: Relator C D) (S: Relator D E) (f: c1 ⟶ c2) (h: e1 ⟶ e2) : ReloCompCandidate R S f h
--- | indirect  {c1 c3 : C} {e1 e3 : E}  (R: Relator C D) (S: Relator D E) (f: c1 ⟶ c3) (h: e1 ⟶ e3) {c2: C} {e2:E} (f1: c1 ⟶ c2 )(f2: c2 ⟶ c3) (h1: e1 ⟶ e2 )(h2: e2 ⟶ e3)(ffEqf: f1≫f2 = f )(hhEqh: h1≫h2 = h) (f1h1: ReloCompCandidate R S f1 h1) (f2h2: ReloCompCandidate R S f2 h2) : ReloCompCandidate R S f h
-
-
-
--- def ReloCompCandidate.eval  {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {E : Type u''} [Category.{v''} E] {R: Relator C D} {S: Relator D E}
---     {c1 c2 : C} {e1 e2 : E} (fh: ReloCompCandidate R S f h) : (f: c1 ⟶ c2) →  (h: e1 ⟶ e2) → Prop :=
---       :=
--- match fh with
--- | direct R S f h => preComp R S f h
--- | indirect R S f h _ _ _ _  ffEqf hhEqh f1h1  f2h2 => eval f1h1 ∧ eval f2h2
-
--- @[simp]
--- def  ReloCompCandidate.fst {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {E : Type u''} [Category.{v''} E] {R: Relator C D} {S: Relator D E} {c1 c2 : C} {e1 e2 : E} {f: c1 ⟶ c2} {h: e1 ⟶ e2}  (_: ReloCompCandidate R S f h) := f
-
--- @[simp]
--- def  ReloCompCandidate.snd {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {E : Type u''} [Category.{v''} E] {R: Relator C D} {S: Relator D E} {c1 c2 : C} {e1 e2 : E} {f: c1 ⟶ c2} {h: e1 ⟶ e2}  (_: ReloCompCandidate R S f h) := h
-
-
-
--- def rel_morph_comp {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {E : Type u''} [Category.{v''} E]  (R: Relator C D) (S: Relator D E) {c1 c3 : C} {e1 e3 : E} (f: c1 ⟶ c3) (h: e1 ⟶ e3)  :=
---     preComp R S f h ∨ (∃ (c2 : C) (e2: E) (f1: c1 ⟶ c2 )(f2: c2 ⟶ c3) (h1: e1 ⟶ e2 )(h2: e2 ⟶ e3),  f1≫f2 = f ∧  (h1≫h2) = h ∧  rel_morph_comp R S f1 h1 ∧ rel_morph_comp R S f2 h2)
-
--- def rel_morph_comp {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D] {E : Type u''} [Category.{v''} E]  (R: Relator C D) (S: Relator D E){X Y : C} {X' Y' : E} f h :=
---     let preComp {X Y : C} {X' Y' : E}(f: X ⟶ Y) (h: X' ⟶ Y') := (∃ (d d' :D) (g:d ⟶d' ), R.rel_morph f g ∧ S.rel_morph g h)
---     -- The definition below says that (f,h) ∈ R;S if either (f,h) ∈  R_morph;S_morph OR there exist pairs (f1,h1), (f2,h2) ∈ R_morph;S_morph such that f1;f2 = f and g1;g2 = g. The second disjunct ensures that pairs in R;S_morph are closed under composition.
---     preComp f h ∨ (∃ (W : C) (W': E) (f1: X ⟶ W )(f2: W ⟶ Y) (h1: X' ⟶ W' )(h2: W' ⟶ Y'),  f1≫f2 = f ∧  (h1≫h2) = h ∧  preComp f1 h1 ∧ preComp f2 h2)
-
-
-  -- obj_id_iff (c : C) (e : E) := by
-  --   constructor
-  --   · intro h
-  --     simp
-  --     simp_all only [relComp]
-  --     constructor
-  --     · obtain ⟨d, Rcd, Sde⟩ := h
-  --       use d
-  --       use  d
-  --       use (𝟙 d)
-  --       have h1 := (R.obj_id_iff c d).mp Rcd
-  --       have h2 := (S.obj_id_iff d e).mp Sde
-  --       exact ⟨h1, h2⟩
-  --   · intro h
-  --     simp_all
-  --     have rel_morph_compRS := h
-  --     obtain ⟨d,d',g , Rids, Sids ⟩ := h
-  --     have h1 := (R.obj_id_iff c d).mpr
-  --     have h2 := (S.obj_id_iff d e).mpr
-  --     have ⟨RSce, _ ⟩  := comp_object_closure rel_morph_compRS
-  --     simp at RSce
-  --     obtain ⟨d3, Rcd3, Sd3e⟩ := RSce
-  --     · use d3
-  --     · rename_i comp_factorizes
-  --       simp at  comp_factorizes
-  --       obtain ⟨c2,e2,f1,f2,f1f2EqIdc, h1, h2, h1h2EqIde, ⟨ d4,d5, g1, Rf1g1,  Sg1g2⟩ , d6, d7, g2, Rf2g2, Sg2h2⟩ :=  comp_factorizes
-  --       have ⟨RSce, _ ⟩  := comp_object_closure rel_morph_compRS
-  --       simp at RSce
-  --       obtain ⟨d3, Rcd3, Sd3e⟩ := RSce
-  --       use d3
-
--- theorem comp_closure {C : Type u} [Category.{v} C] {D : Type u'} [Category.{v'} D]
---   {E : Type u''} [Category.{v''} E]
---   {R : Relator C D} {S : Relator D E}
---   {c1 c2 c3 : C} {e1 e2 e3 : E}
---   {f₁ : c1 ⟶ c2} {f₂ : c2 ⟶ c3} {h₁ : e1 ⟶ e2} {h₂ : e2 ⟶ e3}
---   (RSf1h1 : rel_morph_comp R S f₁ h₁)
---   (RSf2h2 : rel_morph_comp R S f₂ h₂)
---   : rel_morph_comp R S (f₁ ≫ f₂) (h₁ ≫ h₂) := by
---   -- We choose the second disjunct of `rel_morph_comp R S (...) (...)`
---   -- i.e. "∃ W W' f1 f2, f1≫f2 = f₁≫f₂ ∧ ∃ x x₁, x≫x₁ = h₁≫h₂ ∧ …"
---   right
---   -- Supply W=c2, W'=e2, f1=f₁, f2=f₂
---   use c2, e2, f₁, f₂
---   constructor
---   · rfl
---   -- Now supply x = h₁, x₁ = h₂
---   use h₁, h₂
---   constructor
---   · rfl
---   -- Finally we must show:
---   --   (∃ d d' g, R.rel_morph f₁ g ∧ S.rel_morph g h₁) ∧
---   --   (∃ d d' g, R.rel_morph f₂ g ∧ S.rel_morph g h₂).
---   constructor
---   · -- Case analysis on `RSf1h1 : rel_morph_comp R S f₁ h₁`
---     cases RSf1h1 with
---     | inl baseCase =>
---       -- The “base” part already has the form we want
---       exact baseCase
---     | inr compCase =>
---       -- The factorization part also yields a "base" piece for f₁,h₁.
---       obtain ⟨W, W', f1, f2, rfl, rfl,
---         ⟨d, d', g, Rf1g, SgStuff⟩, d2, d3, g2, Rf2g2, Sg2Stuff⟩ := compCase
---       exact ⟨d, d', g, Rf1g, SgStuff⟩
---   · -- Similarly for `RSf2h2`
---     cases RSf2h2 with
---     | inl baseCase =>
---       exact baseCase
---     | inr compCase =>
---       obtain ⟨W, W', f1, f2, rfl, rfl,
---         ⟨d, d', g, Rf1g, SgStuff⟩, d2, d3, g2, Rf2g2, Sg2Stuff⟩ := compCase
---       exact ⟨d, d', g, Rf1g, SgStuff⟩
-
-
-
-
-
--- first to obj comp and morph comp separately
-
--- Then define relations based on those which add in compositions.
-
-
-
-
-
-
-
-
-
-#check  Prod.map compRelation composeRelation
 
 
 end CategoryTheory

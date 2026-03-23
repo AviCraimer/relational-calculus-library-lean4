@@ -19,15 +19,14 @@ structure Subcategory (C : Type u) [Category.{v} C] : Type (max u v) where
 
   comp_closure {X Y Z : C} {f : X ⟶ Y} {g : Y ⟶ Z} (hf: hom_subset f)(hg: hom_subset g)  :    hom_subset (f ≫ g)
 
-lemma subcat_id_iff {C : Type u} [Category C] (S : Subcategory C) (X : C) :
+lemma subcat_id_iff {C : Type u} [Category.{v} C] (S : Subcategory C) (X : C) :
   S.obj_subset X ↔ S.hom_subset (𝟙 X) :=
   S.id_closure X
 
-@[simp]
-lemma subcat_object_closure {X Y :C} [Category C] (S : Subcategory C) {f:(X ⟶ Y)} :  S.hom_subset f →  (S.obj_subset X) ∧ (S.obj_subset Y) := S.object_closure
+lemma subcat_object_closure {X Y :C} [Category.{v} C] (S : Subcategory C) {f:(X ⟶ Y)} :  S.hom_subset f →  (S.obj_subset X) ∧ (S.obj_subset Y) := S.object_closure
 
-@[simp]
-lemma subcat_comp_iff {C : Type u} [Category C] (S : Subcategory C)
+
+lemma subcat_comp_iff {C : Type u} [Category.{v} C] (S : Subcategory C)
   {X Y Z : C}  {f : X ⟶ Y} {g : Y ⟶ Z} (hf: S.hom_subset f)(hg: S.hom_subset g) :  S.hom_subset (f ≫ g) :=
   S.comp_closure hf hg
 
@@ -45,7 +44,7 @@ def Hom  {C : Type u} [Category.{v} C] (S : Subcategory C) (X Y : Carrier S) :=
   { f : X.val ⟶ Y.val // S.hom_subset f }
 
 -- Every subcategory is a category
-instance SubcategoryAsCategory {C : Type u} [hC: Category.{v} C] (S : Subcategory C) : Category.{v} (Carrier S) where
+instance SubcategoryAsCategory {C : Type u} [hC: Category.{v} C] (S : Subcategory C) : Category (Carrier S) where
   Hom X Y := Hom S X Y
   id (Y:S.Carrier) := ⟨𝟙 Y.val, by
     simp [Carrier] at Y

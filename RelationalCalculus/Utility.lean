@@ -1,7 +1,6 @@
-import Mathlib.Tactic
 universe u v
 
 namespace Utility
 
-@[reducible]
+@[simp]
 def typeof {α : Sort u} (_:α) := α

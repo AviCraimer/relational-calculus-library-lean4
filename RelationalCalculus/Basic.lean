@@ -142,7 +142,7 @@ postfix: 80 "ᗮ" => Relation.negation -- \^bot
 
 -- Double converse equals original relation
 @[simp]
-theorem double_converse (R : Relation α β) : eval (converse (converse R)) = eval R := by
+theorem double_converse (R : Relation α β) : eval  (Rᵒᵒ) = eval R := by
   apply funext; intro a; apply funext; intro b
   simp [eval, converse]
 
